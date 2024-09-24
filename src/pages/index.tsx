@@ -1,146 +1,109 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Button, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes, faCircle } from '@fortawesome/free-solid-svg-icons';
 
-// Definição da interface para os benefícios (benefits)
-interface Benefit {
-    name: string;
-    available: boolean;
-  }
-  
-  // Definição da interface para as props do PlanCard
-  interface PlanCardProps {
-    title: string;
-    price: string;
-    benefits: Benefit[];
-  }
-  // Definição dos planos
+
+const Home: React.FC = () => {
+  // Dados dos cards
   const plans = [
     {
-      title: 'Controle',
-      price: 'Free',
-      benefits: [
-        { name: 'Categorias Ilimitadas', available: true },
-        { name: 'Compartilhado', available: true },
-        { name: 'Investimentos', available: false },
-        { name: 'Dashboards', available: false },
+      id: 1,
+      title: 'Me ajeitando!',
+      price: 'R$0',
+      description: 'Conhecendo e me ajustando',
+      buttonLabel: 'Experimente',
+      features: [
+        { label: 'Gestão de Contas', included: true },
+        { label: 'Categoria Ilimitada', included: false },
+        { label: 'Controle de Investimento', included: false },
+        { label: 'Planjamento de Planos Futuros', included: false },
+        { label: 'Compartilhar Contas', included: false },
+        { label: 'Compartilhar Bancos', included: false }
+
       ],
     },
     {
-      title: 'Controle +',
-      price: 'R$ 4,90',
-      benefits: [
-        { name: 'Categorias Ilimitadas', available: true },
-        { name: 'Compartilhado', available: true },
-        { name: 'Investimentos', available: true },
-        { name: 'Dashboards', available: true },
+      id: 2,
+      title: 'Tranquilo',
+      price: 'R$4,90',
+      description: 'Controlando e aprendendo',
+      buttonLabel: 'Experimente',
+      features: [
+        { label: 'Gestão de Contas', included: true },
+        { label: 'Categoria Ilimitada', included: true },
+        { label: 'Controle de Investimento', included: false },
+        { label: 'Planjamento de Planos Futuros', included: false },
+        { label: 'Compartilhar Contas', included: false },
+        { label: 'Compartilhar Bancos', included: false }
       ],
-    },
-    {
-      title: 'Controle View',
-      price: 'R$ 9,90',
-      benefits: [
-        { name: 'Categorias Ilimitadas', available: true },
-        { name: 'Compartilhado', available: true },
-        { name: 'Investimentos', available: true },
-        { name: 'Dashboards', available: true },
-      ],
-    },
+    },   {
+        id: 3,
+        title: 'Visionário',
+        price: 'R$9,99',
+        description: 'Gestor e planejador',
+        buttonLabel: 'Experimente',
+        features: [
+            { label: 'Gestão de Contas', included: true },
+        { label: 'Categoria Ilimitada', included: true },
+        { label: 'Controle de Investimento', included: true },
+        { label: 'Planjamento de Planos Futuros', included: true },
+        { label: 'Compartilhar Contas', included: true },
+        { label: 'Compartilhar Bancos', included: true }
+        ],
+      },
   ];
-  
-  // Componente PlanCard, que exibe os cartões de planos
-  const PlanCard: React.FC<PlanCardProps> = ({ title, price, benefits }) => (
-    <Card
-      sx={{
-        maxWidth: 300,
-        margin: '20px',
-        textAlign: 'center',
-        borderRadius: '16px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        backgroundColor: '#FFFFFF', // Fundo branco
-      }}
-    >
-      <CardContent>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#5E2E91' }}> {/* Roxo */}
-          {title}
-        </Typography>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3, color: '#000' }}>
-          {price}
-        </Typography>
-        <List>
-          {benefits.map((benefit, index) => (
-            <ListItem key={index}>
-              <ListItemIcon>
-                {benefit.available ? (
-                  <CheckCircleIcon sx={{ color: '#5E2E91' }} /> // Roxo para check
-                ) : (
-                  <CancelIcon sx={{ color: '#9e9e9e' }} /> // Cinza para X
-                )}
-              </ListItemIcon>
-              <ListItemText
-                primary={benefit.name}
-                sx={{
-                  textDecoration: benefit.available ? 'none' : 'line-through',
-                  color: benefit.available ? '#000' : '#9e9e9e',
-                }}
-              />
-            </ListItem>
-          ))}
-        </List>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: '#5E2E91', // Roxo para botões
-            color: '#fff',
-            textTransform: 'uppercase',
-            padding: '10px 20px',
-            '&:hover': {
-              backgroundColor: '#42196D', // Roxo mais escuro no hover
-            },
-          }}
-        >
-          Escolher Plano
-        </Button>
-      </CardContent>
-    </Card>
-  );
-  
-  // Componente principal da página
-  const Home = () => (
-    <Box sx={{ backgroundColor: '#6A0DAD', minHeight: '100vh', padding: '40px 20px' }}> {/* Fundo Roxo Vibrante */}
-    <Typography
-      variant="h2"
-      sx={{
-        fontFamily: 'Quicksand, sans-serif', // Fonte moderna
-        textAlign: 'center',
-        fontWeight: 'bold',
-        color: '#FFDD00', // Amarelo Vibrante para o logo
-        mb: 3,
-      }}
-    >
-      Winpy
-    </Typography>
-    <Typography
-      variant="h6"
-      sx={{
-        fontFamily: 'Quicksand, sans-serif',
-        textAlign: 'center',
-        color: '#FFFFFF', // Texto branco
-        mb: 5,
-      }}
-    >
-      Controle seus custos de forma eficiente!
-    </Typography>
-    <Grid container justifyContent="center" spacing={4}>
-      {plans.map((plan, index) => (
-        <Grid item key={index}>
-          <PlanCard title={plan.title} price={plan.price} benefits={plan.benefits} />
-        </Grid>
+
+
+
+  return (
+    <div className="bg-gray-100 min-h-screen">
+      {/* Navbar */}
+
+
+      {/* Título e Subtítulo */}
+      <header className="text-center py-10">
+        <h1 className="font-bungee text-8xl font-bold mb-4">NestEgg</h1>
+        <p className="text-lg text-gray-600">Seu Caderno Financeiro</p>
+      </header>
+
+      {/* Cards */}
+      <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 p-6 justify-center">
+      {plans.map((plan) => (
+        <div key={plan.id} className="bg-white border border-gray-300 rounded-lg p-6 shadow-md">
+          {/* Título e Preço */}
+          <h2 className="text-xl font-bold mb-2">{plan.title}</h2>
+          <p className="text-4xl font-bold">{plan.price}</p>
+          <p className="text-gray-400 mb-5">{plan.description}</p>
+
+          {/* Botão */}
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300 w-full mb-6">
+            {plan.buttonLabel}
+          </button>
+
+          {/* Lista de Features */}
+          <p className="font-semibold mb-2">Inclui:</p>
+          <ul className="mb-4">
+            {plan.features.map((feature, index) => (
+              <li key={index} className="flex items-center mb-2">
+                {/* Verificação se o recurso está incluído */}
+                <div className="mr-2">
+                  {feature.included ? (
+                    <span className="text-green-500">✔️</span>
+                  ) : (
+                    <span className="text-red-500">❌</span>
+                  )}
+                </div>
+                <p className={`text-gray-600 ${!feature.included ? 'line-through text-gray-400' : ''}`}>
+                  {feature.label}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </Grid>
-  </Box>
-);
-  
-  export default Home;
-  
+    </section>
+    </div>
+  );
+}
+
+export default Home;
