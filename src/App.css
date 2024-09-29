@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+.anton-font {
+  font-family: 'Anton', sans-serif;
+  font-size: 3rem; /* Ajuste o tamanho conforme necessário */
+  color: #333; /* Ajuste a cor conforme desejado */
+}

@@ -1,0 +1,8 @@
+.custom-hr {
+    border: none; /* Remove a borda padrão do <hr> */
+    height: 0.1px; /* Define a altura da linha */
+    background: #282931; /* Cor semi-branca */
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    position: relative;
+  }
+ 
