@@ -1,55 +1,41 @@
-import { NavigateFunction } from "react-router-dom";
+import { Navigation } from "@toolpad/core";
 
-interface MenuItem {
-  text: string;
-  action: () => void;
-  categoria: boolean;
-}
-
-export const dataMenu = (navigate: NavigateFunction): MenuItem[] => [
+export const dataSideBar: Navigation = [
   {
-    text: "Cadastro",
-    action: () => {},
-    categoria: true,
+    kind: 'header',
+    title: 'Main items',
   },
   {
-    text: "ADM",
-    action: () => {
-      navigate("/cadastro/adm");
-    },
-    categoria: false,
+    segment: '/path/cadastro/adm',
+    title: 'Dashboard',
   },
   {
-    text: "Categoria",
-    action: () => {
-      navigate("/cadastro/categoria");
-    },
-    categoria: false,
+    segment: '/cadastro/usuario',
+    title: 'Usuario',
   },
   {
-    text: "Conta",
-    action: () => {
-      navigate("/cadastro/conta");
-    },
-    categoria: false,
+    kind: 'divider',
   },
   {
-    text: "Dados Pagamento",
-    action: () => {
-      navigate("/cadastro/dadosPagamento");
-    },
-    categoria: false,
+    kind: 'header',
+    title: 'Analytics',
   },
   {
-    text: "Mes",
-    action: () => {},
-    categoria: true,
+    segment: '/cadastro/',
+    title: 'Categoria',
+    children: [
+      {
+        segment: '/cadastro/categoria/dadosPagamento',
+        title: 'Dados Pagamento',
+      },
+      {
+        segment: '/cadastro/categoria/despesa',
+        title: 'Despesa',
+      },
+    ],
   },
   {
-    text: "Lançamento Despesas",
-    action: () => {
-      navigate("/cadastro/categoria");
-    },
-    categoria: false,
+    segment: '/cadastro/categoria/extrato',
+    title: 'Extrato',
   },
 ];

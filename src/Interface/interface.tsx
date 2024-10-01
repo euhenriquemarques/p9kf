@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export  interface iBanco {
   id: number;
     codigo: string;
@@ -66,4 +68,23 @@ export  interface iBanco {
     descricao: string;
   }
   
+
+  
+  export interface iExtratoDespesa {
+    id: number;
+    valor:number,
+    valorJuros:number,
+    valorDesconto:number,
+    despesa:iDespesas,
+    usuario: iUsuario;
+    dataProcessamento: string;
+    dataPagamento: Dayjs | string;
+  }
+
+  export interface iSaldo {
+    id: number;
+    saldo:number,
+    conta:iConta,
+  
+  }
   

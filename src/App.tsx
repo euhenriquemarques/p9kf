@@ -1,4 +1,3 @@
-// src/App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Usuario from "./Component/Usuario/index";
@@ -10,6 +9,11 @@ import Principal from "./Pages/Principal";
 import Categoria from "./Component/Categoria";
 import Conta from "./Component/Conta";
 import DadosPagamento from "./Component/DadosPagamento";
+import Despesa from "./Component/Despesa";
+import ExtratoDespesa from "./Component/ExtratoDespesa";
+import Saldo from "./Component/Saldo";
+import DashboardLayoutBasic from "./Component/Sidebar/sidebar";
+import NotFound from "./Pages/404/notFound";
 
 const App: React.FC = () => {
   return (
@@ -20,13 +24,39 @@ const App: React.FC = () => {
           <hr />
 
           <Routes>
+            {/* Rotas públicas */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/cadastro" element={<Principal />}>
-              <Route path="/cadastro/adm" element={ <> <Banco /> <Usuario />  </> } />
-              <Route path="/cadastro/categoria" element={<Categoria />} />
-              <Route path="/cadastro/conta" element={<Conta />} />
-              <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
-            </Route>
+
+            {/* Rotas que utilizam o layout de dashboard */}
+            <Route
+              path="/*"
+              element={
+                <DashboardLayoutBasic>
+                  <Routes>
+                    <Route path="/cadastro/adm" element={<Banco />} />
+                    <Route path="/cadastro/usuario" element={<Usuario />} />
+                    <Route path="/cadastro/categoria" element={<Categoria />} />
+                    <Route path="/cadastro/conta" element={<Conta />} />
+                    <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
+                    <Route path="/cadastro/despesa" element={<Despesa />} />
+                    <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
+                  </Routes>
+                </DashboardLayoutBasic>
+              }
+            />
+
+            {/* Rota adicional com layout */}
+            <Route
+              path="/saldo"
+              element={
+                <DashboardLayoutBasic>
+                  <Saldo />
+                </DashboardLayoutBasic>
+              }
+            />
+
+            {/* Rota 404 */}
+            <Route path="/*" element={<NotFound />} />
           </Routes>
         </Box>
       </div>

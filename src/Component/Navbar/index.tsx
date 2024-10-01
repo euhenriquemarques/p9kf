@@ -19,8 +19,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import "./style.css";
-import Sidebar from "../Menu";
 import { Egg } from "@mui/icons-material";
+import DashboardLayoutBasic from "../Sidebar/sidebar";
 
 interface MenuItemType {
   text: string;
@@ -121,7 +121,7 @@ const Navbar: React.FC = () => {
         }}
       >
         <Toolbar>
-          <Sidebar />
+    
           {/* Logo */}
           <Typography
             variant="h6"
