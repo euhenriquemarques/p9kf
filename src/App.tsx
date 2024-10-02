@@ -25,38 +25,29 @@ const App: React.FC = () => {
 
           <Routes>
             {/* Rotas públicas */}
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/price" element={<LandingPage />} />
 
             {/* Rotas que utilizam o layout de dashboard */}
             <Route
-              path="/*"
+              path="/"
               element={
-                <DashboardLayoutBasic>
-                  <Routes>
-                    <Route path="/cadastro/adm" element={<Banco />} />
-                    <Route path="/cadastro/usuario" element={<Usuario />} />
-                    <Route path="/cadastro/categoria" element={<Categoria />} />
-                    <Route path="/cadastro/conta" element={<Conta />} />
-                    <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
-                    <Route path="/cadastro/despesa" element={<Despesa />} />
-                    <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
-                  </Routes>
-                </DashboardLayoutBasic>
+                <Principal>
+                  <DashboardLayoutBasic />
+                </Principal>
               }
-            />
-
-            {/* Rota adicional com layout */}
-            <Route
-              path="/saldo"
-              element={
-                <DashboardLayoutBasic>
-                  <Saldo />
-                </DashboardLayoutBasic>
-              }
-            />
-
-            {/* Rota 404 */}
-            <Route path="/*" element={<NotFound />} />
+            >
+              <Route path="/" element={<Principal />} />
+              {/* Sub-rotas dentro de Dashboard */}
+              <Route path="/cadastro/adm" element={ <> <Banco />  <Usuario /> </>} />
+              <Route path="/cadastro/categoria" element={<Categoria />} />
+              <Route path="/cadastro/conta" element={<Conta />} />
+              <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
+              <Route path="/cadastro/despesa" element={<Despesa />} />
+              <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
+              <Route path="/saldo" element={<Saldo />} />
+            </Route>
+                  {/* Rota 404 */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Box>
       </div>

@@ -1,41 +1,57 @@
+import { FolderIcon } from "@heroicons/react/24/outline";
+import { Coffee, CoffeeOutlined, LockPerson, MonetizationOn, MonetizationOnOutlined, MonetizationOnRounded, MonetizationOnSharp, MonetizationOnTwoTone, Money, MoneyOffTwoTone, MoneySharp, MoneyTwoTone, PersonPinCircleRounded, RuleFolder, RuleFolderOutlined } from "@mui/icons-material";
 import { Navigation } from "@toolpad/core";
 
 export const dataSideBar: Navigation = [
   {
     kind: 'header',
-    title: 'Main items',
+    title: 'Menu',
   },
   {
-    segment: '/path/cadastro/adm',
-    title: 'Dashboard',
-  },
-  {
-    segment: '/cadastro/usuario',
-    title: 'Usuario',
+    segment: 'cadastro/adm',
+    title: 'ADM',
+    icon: <LockPerson />,
   },
   {
     kind: 'divider',
   },
   {
     kind: 'header',
-    title: 'Analytics',
+    title: 'Cadastro',
   },
   {
-    segment: '/cadastro/',
-    title: 'Categoria',
+    segment: '/cadastro',
+    title: 'Cadastros',
+    icon: <CoffeeOutlined />,
     children: [
       {
-        segment: '/cadastro/categoria/dadosPagamento',
+        segment: 'cadastro/conta',
+        title: 'Conta',
+      },
+      {
+        segment: 'cadastro/categoria',
+        title: 'Categoria',
+      },
+      {
+        segment: 'cadastro/dadosPagamento',
         title: 'Dados Pagamento',
       },
       {
-        segment: '/cadastro/categoria/despesa',
+        segment: 'cadastro/despesa',
         title: 'Despesa',
       },
     ],
   },
   {
-    segment: '/cadastro/categoria/extrato',
-    title: 'Extrato',
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Gestão',
+  },
+  {
+    segment: 'saldo',
+    title: 'Saldo',
+    icon: <MonetizationOnOutlined />,
   },
 ];

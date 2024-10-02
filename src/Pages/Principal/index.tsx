@@ -1,14 +1,18 @@
 import React from "react";
-import "@fontsource/anton"; 
+import "@fontsource/anton";
 import { Outlet } from "react-router-dom";
+import { Box } from "@mui/material";
 
+interface PrincipalProps {
+  children?: React.ReactNode;
+}
 
-const Principal: React.FC = () => {
- 
+const Principal: React.FC<PrincipalProps> = ({ children }) => {
   return (
-    <div className="bg-gray-100 min-h-screen">
-        <Outlet />
-    </div>
+    <Box className="bg-gray-100 min-h-screen"   >
+      {children} {/* Renderiza qualquer children passado para `Principal` */}
+      <Outlet /> {/* Renderiza as sub-rotas */}
+    </Box>
   );
 };
 

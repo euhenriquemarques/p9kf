@@ -20,7 +20,7 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#1976d2', // Azul padrão do MUI
+      main: '#ffffff', // Azul padrão do MUI
     },
     secondary: {
       main: '#dc004e', // Cor secundária, se necessário

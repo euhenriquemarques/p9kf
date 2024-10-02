@@ -5,27 +5,42 @@ import { createTheme } from '@mui/material/styles';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useLocation, useNavigate } from 'react-router-dom';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation, Session } from '@toolpad/core';
 import { dataSideBar } from '../Menu/data';
+import "./style.css";
+import { log } from 'console';
 
 const NAVIGATION: Navigation = dataSideBar;
 
 const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+  typography: {
+    h6: {
+      fontFamily: "Anton !important",
+      fontSize: "2rem",
+      color: "#ffffff !important",
+    },
   },
-  colorSchemes: { light: true, dark: true },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
+  components: {
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: "#ffffff", // Define a cor do ícone no botão
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          '& .MuiToolbar-root': {
+            backgroundColor: '#0e0f15',
+            color: '#ffffff',
+            
+          },
+        },
+      },
     },
   },
 });
-
 
 
 interface DemoProps {
@@ -44,7 +59,7 @@ export default function DashboardLayoutBasic(props: DemoProps) {
       searchParams: new URLSearchParams(location.search),
       navigate: (path: string | URL) => {
         if (typeof path === 'string') {
-          navigate(path);
+          navigate(path);  // Apenas navegue para o caminho diretamente
         } else {
           navigate(path.toString());
         }
@@ -53,10 +68,16 @@ export default function DashboardLayoutBasic(props: DemoProps) {
   }, [location, navigate]);
 
   return (
-    <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
+    
+    <AppProvider  navigation={NAVIGATION} router={router} theme={demoTheme}  branding={{
+      title: "NestEgg",
+      logo: <span style={{ display: 'none' }} />,}}>
       <DashboardLayout>
         {children}
       </DashboardLayout>
     </AppProvider>
   );
 }
+
+
+
