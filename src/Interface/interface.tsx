@@ -87,4 +87,25 @@ export  interface iBanco {
     conta:iConta,
   
   }
+
+  export interface iHomeDto {
+    listaSaldo: iSaldoDto[],
+    listaDespesas: iDespesasDto[],
+  }
+
+  export interface iSaldoDto {
+    saldo:number,
+    banco:string,
+    numero:string,
+  
+  }
+  
+  export interface iDespesasDto {
+    parcela: number;
+    parcelaTotais: number;
+    dataVencimentoParcela: string;
+    valorParcela: number;
+    descricao: string;
+
+  }
   

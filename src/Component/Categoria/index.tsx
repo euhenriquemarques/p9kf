@@ -18,8 +18,14 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Autocomplete,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import { iCategoria } from "../../Interface/interface";
+import axios from "axios";
 
 
 const Categoria: React.FC = () => {
@@ -28,7 +34,8 @@ const Categoria: React.FC = () => {
     descricao: "",
     movimentacao: "",
   });
-
+  const [openModal, setOpenModal] = useState(false);
+  const [listaCategoria, setListaCategoria] = useState<iCategoria[]>([]);
   const [tipoCategoriaLista, setTipoCategoriaLista] = useState<string[]>([]);
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -43,6 +50,48 @@ const Categoria: React.FC = () => {
       ...prevState,
       [name]: value,
     }));
+  };
+
+  const handleSelect = (event: React.SyntheticEvent, value: iCategoria | null) => {
+    if (value) {
+      setFormData({
+        id: value.id,
+        movimentacao: value.movimentacao,
+        descricao: value.descricao,
+      });
+    }
+  };
+
+  const buscarCategoria = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/categoria/todos",
+        {
+          params: {
+            idUsuario: 1,
+          },
+        }
+      );
+      setListaCategoria(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar categoria:", error);
+    }
+  };
+
+  // Buscar a lista de bancos ao abrir o modal
+  useEffect(() => {
+    if (openModal && listaCategoria.length==0) {
+      buscarCategoria();
+    }
+  }, [openModal]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
   };
 
   const handleTextFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,6 +132,7 @@ const Categoria: React.FC = () => {
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
           handleReset()
+          buscarCategoria();
         } else {
           // Erro
           const errorText = await response.text();
@@ -214,12 +264,15 @@ const Categoria: React.FC = () => {
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button variant="outlined" onClick={handleOpenModal}>
+              Buscar 
+            </Button>
             <Button
               type="button"
               onClick={handleReset}
               variant="outlined"
               color="secondary"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2 ,ml: 1 }}
             >
               Cancelar
             </Button>
@@ -230,6 +283,35 @@ const Categoria: React.FC = () => {
         </form>
       </Card>
       <Divider />
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: { width: "80%", height: "40%" },
+        }}
+      >
+        <DialogTitle>Selecionar Categoria</DialogTitle>
+        <DialogContent>
+          <FormControl   fullWidth>
+           <Autocomplete
+            options={listaCategoria}
+            getOptionLabel={(option) => `${option.descricao}`}
+            renderInput={(params) => (
+              <TextField {...params} label="Buscar por Código ou Descrição" fullWidth margin="dense" />
+            )}
+            onChange={handleSelect}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} variant="contained">
+            Aplicar
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar para Feedback */}
       <Snackbar
         open={openSnackbar}

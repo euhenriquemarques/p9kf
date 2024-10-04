@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -10,17 +10,27 @@ import {
   Alert,
   Breadcrumbs,
   Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Autocomplete,
 } from "@mui/material";
 import { iBanco } from "../../Interface/interface";
 
-
 const Banco: React.FC = () => {
   const [formData, setFormData] = useState<iBanco>({
-    id:0,
+    id: 0,
     codigo: "",
     descricao: "",
   });
-
+  const [openModal, setOpenModal] = useState(false);
+  const [listaBanco, setListaBanco] = useState<iBanco[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -34,6 +44,17 @@ const Banco: React.FC = () => {
       [name]: value,
     }));
   };
+
+  const handleSelect = (event: React.SyntheticEvent, value: iBanco | null) => {
+    if (value) {
+      setFormData({
+        id: value.id,
+        codigo: value.codigo,
+        descricao: value.descricao,
+      });
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +73,11 @@ const Banco: React.FC = () => {
         setOpenSnackbar(true);
         // Limpar o formulário
         setFormData({
-          id:0,
+          id: 0,
           codigo: "",
           descricao: "",
         });
+        buscarBancos();
       } else {
         // Erro
         const errorText = await response.text();
@@ -83,10 +105,36 @@ const Banco: React.FC = () => {
 
   const handleReset = () => {
     setFormData({
-      id:0,
+      id: 0,
       codigo: "",
       descricao: "",
     });
+  };
+
+  const buscarBancos = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/banco");
+      const data = await response.json();
+      setListaBanco(data);
+    } catch (error) {
+      console.error("Erro ao buscar bancos:", error);
+    }
+  };
+
+  // Buscar a lista de bancos ao abrir o modal
+  useEffect(() => {
+    if (openModal && listaBanco.length==0) {
+      buscarBancos();
+    }
+  }, [openModal]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
   };
 
   return (
@@ -114,8 +162,6 @@ const Banco: React.FC = () => {
         </Breadcrumbs>
 
         <form onSubmit={handleSubmit}>
-
-
           <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
             <Grid item xs={12} md={3}>
               <TextField
@@ -129,7 +175,6 @@ const Banco: React.FC = () => {
               />
             </Grid>
 
-     
             <Grid item xs={12} md={9}>
               <TextField
                 label="Descrição"
@@ -144,12 +189,15 @@ const Banco: React.FC = () => {
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button variant="outlined" onClick={handleOpenModal}>
+              Buscar 
+            </Button>
             <Button
               type="button"
               onClick={handleReset}
               variant="outlined"
               color="secondary"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2 ,ml: 1 }}
             >
               Cancelar
             </Button>
@@ -160,6 +208,37 @@ const Banco: React.FC = () => {
         </form>
       </Card>
       <Divider />
+
+      {/* Modal para seleção de bancos */}
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: { width: "80%", height: "40%" },
+        }}
+      >
+        <DialogTitle>Selecionar Banco</DialogTitle>
+        <DialogContent>
+          <FormControl   fullWidth>
+           <Autocomplete
+            options={listaBanco}
+            getOptionLabel={(option) => `${option.codigo} - ${option.descricao}`}
+            renderInput={(params) => (
+              <TextField {...params} label="Buscar por Código ou Descrição" fullWidth margin="dense" />
+            )}
+            onChange={handleSelect}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} variant="contained">
+            Aplicar
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar para Feedback */}
       <Snackbar
         open={openSnackbar}
@@ -175,7 +254,6 @@ const Banco: React.FC = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
     </Box>
   );
 };

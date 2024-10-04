@@ -14,6 +14,7 @@ import ExtratoDespesa from "./Component/ExtratoDespesa";
 import Saldo from "./Component/Saldo";
 import DashboardLayoutBasic from "./Component/Sidebar/sidebar";
 import NotFound from "./Pages/404/notFound";
+import HomePage from "./Component/Dashboard";
 
 const App: React.FC = () => {
   return (
@@ -36,7 +37,7 @@ const App: React.FC = () => {
                 </Principal>
               }
             >
-              <Route path="/" element={<Principal />} />
+              <Route path="/" element={<HomePage />} />
               {/* Sub-rotas dentro de Dashboard */}
               <Route path="/cadastro/adm" element={ <> <Banco />  <Usuario /> </>} />
               <Route path="/cadastro/categoria" element={<Categoria />} />

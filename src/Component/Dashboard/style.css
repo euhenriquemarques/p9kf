@@ -1,0 +1,89 @@
+/* HomePage.css */
+
+/* Container principal */
+.homepage-container {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Container do Grid */
+.homepage-grid-container {
+  width: 90%;
+}
+
+/* Card Principal */
+.main-card {
+  padding: 16px;
+  background-color: #4A4A5A;
+  color: #ffffff;
+  border-radius: 16px;
+  height: 100%;
+}
+
+.main-cards {
+  height: 100px; /* Altura fixa do Paper */
+  padding: 16px;
+  border-radius: 16px;
+  background-color: #4A4A5A;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Texto de aprendizado */
+.learn-how-btn {
+  margin-top: 16px;
+  background-color: #ffffff;
+  color: #4A4A5A;
+}
+
+/* Card de Colaboração */
+.collaborate-card {
+  padding: 16px;
+  background-color: #E3E6F3;
+  border-radius: 16px;
+  height: 150px;
+}
+
+.download-btn {
+  margin-top: 16px;
+  background-color: #8DF35C;
+  color: #000000;
+}
+
+/* Card de Membro da Equipe */
+.team-card {
+  padding: 8px;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  height: 150px;
+}
+
+/* Card de Oliver Haller */
+.oliver-card {
+  background-color: #DCE3F3;
+}
+
+/* Card Join Us */
+.join-card {
+  padding: 16px;
+  background-color: #E8CEB3;
+  border-radius: 16px;
+  height: 150px;
+}
+
+.join-now-btn {
+  margin-top: 16px;
+  background-color: #B35C3F;
+  color: #FFFFFF;
+}
+
+/* Card Social Media Managers */
+.social-card {
+  padding: 16px;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  height: 150px;
+}
