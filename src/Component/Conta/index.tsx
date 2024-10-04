@@ -22,9 +22,15 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  Autocomplete,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import { iBanco, iCategoria, iConta } from "../../Interface/interface";
 import { log } from "console";
+import axios from "axios";
 
 const Conta: React.FC = () => {
   const [formData, setFormData] = useState<iConta>({
@@ -46,12 +52,62 @@ const Conta: React.FC = () => {
   });
 
   const [bancosLista, setBancosListas] = useState<iBanco[]>([]);
-
+  const [openModal, setOpenModal] = useState(false);
+  const [listaConta, setListaConta] = useState<iConta[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+
+
+
+  const handleSelect = (event: React.SyntheticEvent, value: iConta | null) => {
+    if (value) {
+      setFormData({
+        id: value.id,
+        numero: value.numero,
+        agencia: value.agencia,
+        banco: value.banco,
+        compartilhado: value.compartilhado,
+        status: value.status,
+        nacional: value.nacional,
+        usuario: value.usuario
+      })
+    }
+  };
+
+  const buscarConta = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/conta",
+        {
+          params: {
+            idUsuario: 1,
+          },
+        }
+      );
+      setListaConta(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar categoria:", error);
+    }
+  };
+
+  // Buscar a lista de bancos ao abrir o modal
+  useEffect(() => {
+    if (openModal && listaConta.length==0) {
+      buscarConta();
+    }
+  }, [openModal]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleSelectChange = (e: SelectChangeEvent<string | number >) => {
 
@@ -100,6 +156,7 @@ const Conta: React.FC = () => {
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
           handleReset();
+          buscarConta();
         } else {
           // Erro
           const errorText = await response.text();
@@ -319,12 +376,15 @@ const Conta: React.FC = () => {
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button variant="outlined" onClick={handleOpenModal}>
+              Buscar 
+            </Button>
             <Button
               type="button"
               onClick={handleReset}
               variant="outlined"
               color="secondary"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2 ,ml: 1 }}
             >
               Cancelar
             </Button>
@@ -335,6 +395,47 @@ const Conta: React.FC = () => {
         </form>
       </Card>
       <Divider />
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: { width: "80%", height: "40%" },
+        }}
+      >
+        <DialogTitle>Selecionar Conta</DialogTitle>
+        <DialogContent>
+        <FormControl fullWidth>
+      <Autocomplete
+        options={listaConta}
+        getOptionLabel={(option) =>
+          `${option.banco.descricao} - Agência: ${option.agencia} - Número: ${option.numero}`
+        }
+        renderOption={(props, option) => (
+          <li {...props} key={option.id}>
+            {`${option.banco.descricao} - Agência: ${option.agencia} - Número: ${option.numero}`}
+          </li>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Buscar por Banco, Agência ou Número"
+            fullWidth
+            margin="dense"
+          />
+        )}
+        onChange={handleSelect}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+      />
+    </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} variant="contained">
+            Aplicar
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar para Feedback */}
       <Snackbar
         open={openSnackbar}
