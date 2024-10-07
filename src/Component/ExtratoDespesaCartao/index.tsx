@@ -21,9 +21,10 @@ import {
   RadioGroup,
 } from "@mui/material";
 import {
+  iCartao,
   iCategoria,
   iDespesas,
-  iExtratoDespesa,
+  iExtratoDespesaCartao,
 } from "../../Interface/interface";
 import axios from "axios";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -34,8 +35,8 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/pt-br";
 
-const ExtratoDespesa: React.FC = () => {
-  const [formData, setFormData] = useState<iExtratoDespesa>({
+const ExtratoDespesaCartao: React.FC = () => {
+  const [formData, setFormData] = useState<iExtratoDespesaCartao>({
     id: 0,
     valor: 0,
     valorJuros: 0,
@@ -46,35 +47,19 @@ const ExtratoDespesa: React.FC = () => {
       descricao: "",
     },
     dataProcessamento: "",
-    despesa: {
+    cartao: {
       id: 0,
-      categoria: {
-        id: 0,
-        descricao: "",
-        movimentacao: "",
-        usuario: {
-          id: 1,
-          descricao: "",
-        },
-      },
+      descricao: "",
+      dataVencimentoCartao: "",
+      dataFechamento: "",
       usuario: {
         id: 1,
         descricao: "",
       },
-      dataProcessamento: "",
-      recorrente: false,
-      parcela: 1,
-      parcelaTotais: 1,
-      dataVencimentoParcela:dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-      juros: false,
-      ativo: true,
-      valorParcela: 0,
-      valorTotal: 0,
-      descricao: "",
     },
   });
 
-  const [despesasLista, setDespesaLista] = useState<iDespesas[]>([]);
+  const [cartaoLista, setCartaoLista] = useState<iCartao[]>([]);
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -85,15 +70,10 @@ const ExtratoDespesa: React.FC = () => {
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const { name, value } = e.target;
 
-    const selecionado = despesasLista.find((item) => item.id === Number(value));
+    const selecionado = cartaoLista.find((item) => item.id === Number(value));
     setFormData((prevState) => ({
       ...prevState,
       [name]: selecionado,
-    }));
-
-    setFormData((prevState) => ({
-      ...prevState,
-      ["valor"]: Number(selecionado?.valorParcela),
     }));
   };
 
@@ -143,7 +123,7 @@ const ExtratoDespesa: React.FC = () => {
 
     if (isValid) {
       try {
-        const response = await fetch("http://localhost:8080/extratoDespesa", {
+        const response = await fetch("http://localhost:8080/extratoDespesaCartao", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -154,9 +134,9 @@ const ExtratoDespesa: React.FC = () => {
           setSnackbarMessage("Cadastro realizado com sucesso!");
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
-          setDespesaLista([]);
+          setCartaoLista([]);
           handleReset();
-          buscarDespesasVigentes();
+          buscarCartoes();
         } else {
           // Erro
           const errorText = await response.text();
@@ -195,39 +175,23 @@ const ExtratoDespesa: React.FC = () => {
         descricao: "",
       },
       dataProcessamento: "",
-      despesa: {
+      cartao: {
         id: 0,
-        categoria: {
-          id: 0,
-          descricao: "",
-          movimentacao: "",
-          usuario: {
-            id: 1,
-            descricao: "",
-          },
-        },
+        descricao: "",
+        dataVencimentoCartao: "",
+        dataFechamento: "",
         usuario: {
           id: 1,
           descricao: "",
         },
-        dataProcessamento: "",
-        recorrente: false,
-        parcela: 1,
-        parcelaTotais: 1,
-        dataVencimentoParcela:dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-        juros: false,
-        ativo: true,
-        valorParcela: 0,
-        valorTotal: 0,
-        descricao: "",
       },
     });
   };
 
-  async function buscarDespesasVigentes() {
+  async function buscarCartoes() {
     try {
       const response = await axios.get(
-        "http://localhost:8080/despesa/vigente",
+        "http://localhost:8080/cartao/todos",
         {
           params: {
             idUsuario: 1,
@@ -236,11 +200,11 @@ const ExtratoDespesa: React.FC = () => {
       );
       if (response.status === 200) {
         const data = await response.data;
-        setDespesaLista(data);
+        setCartaoLista(data);
       } else {
         // Erro
         const errorText = await response.status;
-        setSnackbarMessage("Erro ao buscar Bancos ");
+        setSnackbarMessage("Erro ao buscar Cartao ");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -252,7 +216,7 @@ const ExtratoDespesa: React.FC = () => {
   }
 
   useEffect(() => {
-    buscarDespesasVigentes();
+    buscarCartoes();
   }, []);
 
   return (
@@ -275,29 +239,25 @@ const ExtratoDespesa: React.FC = () => {
       >
         <Breadcrumbs separator="›" aria-label="breadcrumbs">
           <Typography>Cadastro</Typography>
-          <Typography>Extrato Despesa</Typography>
+          <Typography>Extrato Despesa Cartao</Typography>
         </Breadcrumbs>
 
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
             <Grid item xs={12} md={8}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel id="despesa-label">Despesa</InputLabel>
+                <InputLabel id="cartao-label">Cartao</InputLabel>
                 <Select
-                  labelId="despesa-label"
-                  id="despesa"
-                  name="despesa"
-                  value={formData.despesa.id}
+                  labelId="cartao-label"
+                  id="cartao"
+                  name="cartao"
+                  value={formData.cartao.id}
                   onChange={handleSelectChange}
-                  label="Despesa"
+                  label="Cartao"
                 >
-                  {despesasLista.map((tipo, index) => (
+                  {cartaoLista.map((tipo, index) => (
                     <MenuItem key={index} value={tipo.id}>
-                       <span style={{minWidth: "250px"}}> {tipo.descricao}</span> |{" "}
-                      <strong>Parcela:</strong>    <span style={{minWidth: "80px"}}>{tipo.parcela}/{tipo.parcelaTotais}</span>  |   
-                      <strong>Valor:</strong>   <span style={{minWidth: "130px"}}> {formatCurrency(tipo.valorParcela)}</span>  | 
-                      <strong>Venc:</strong>   <span style={{minWidth: "80px"}}> {formatData(dayjs(tipo.dataVencimentoParcela))} </span>
-                   
+                       <span > {tipo.descricao}</span> 
                     </MenuItem>
                   ))}
                 </Select>
@@ -396,4 +356,4 @@ const ExtratoDespesa: React.FC = () => {
   );
 };
 
-export default ExtratoDespesa;
+export default ExtratoDespesaCartao;

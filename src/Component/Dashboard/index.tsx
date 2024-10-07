@@ -6,13 +6,36 @@ import dayjs from "dayjs";
 
 const HomePage: React.FC = () => {
   const [formData, setFormData] = useState<iHomeDto>({
-    listaDespesas: [
+    valortotalParcelado: 0,
+    valortotalRecorrente: 0,
+    listaDespesaCartao: [{ valor: 0, descricao: "" }],
+    listaDespesa: [
       {
         parcela: 1,
         parcelaTotais: 1,
-        dataVencimentoParcela: dayjs().format("DD/MM/YYYY"),
+        dataVencimentoParcela: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         valorParcela: 0,
         descricao: "",
+      },
+    ],
+    listaExtratoDespesa: [
+      {
+        parcela: 1,
+        valor: 0,
+        valorJuros: 0,
+        valorDesconto: 0,
+        dataVencimento: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        dataPagamento: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        despesa: "",
+      },
+    ],
+    listaExtratoDespesaCartao: [
+      {
+        valor: 0,
+        valorJuros: 0,
+        valorDesconto: 0,
+        dataPagamento: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        cartao: "",
       },
     ],
     listaSaldo: [
@@ -34,6 +57,7 @@ const HomePage: React.FC = () => {
       if (response.status === 200) {
         const data = await response.data;
         setFormData(data);
+        console.log(data);
       } else {
         // Erro
         const errorText = await response.status;
@@ -43,7 +67,7 @@ const HomePage: React.FC = () => {
     }
   }
 
-    useEffect(() => {
+  useEffect(() => {
     buscarHome();
   }, []);
 
@@ -58,188 +82,662 @@ const HomePage: React.FC = () => {
       .replace("$", "$ "); // Adiciona um espaço após o símbolo $
   };
 
+  const calcularValorFaltante = () => {
+    return formData.listaDespesa.reduce((total, despesa) => {
+      return total + despesa.valorParcela;
+    }, 0);
+  };
+
+  const calcularValorPagase = () => {
+    return formData.listaExtratoDespesa.reduce((total, despesa) => {
+      return (
+        total + (despesa.valor + despesa.valorJuros) - despesa.valorDesconto
+      );
+    }, 0);
+  };
+
+  const calcularSaldos = () => {
+    return formData.listaSaldo.reduce((total, despesa) => {
+      return total + despesa.saldo;
+    }, 0);
+  };
+
+  const valorFaltante = calcularValorFaltante();
+  const valorSaldo = calcularSaldos();
+  const valorTotalMes = calcularValorPagase();
+  const valorReceitaMes = calcularValorPagase();
+
   return (
     <Box
       sx={{
-        padding: 4,
+        padding: 0,
         display: "flex",
         justifyContent: "center",
+        backgroundColor: "#181818", // Fundo geral da página
+        minHeight: "100vh",
+        color: "#FFFFFF",
       }}
     >
       <Grid container spacing={2} sx={{ width: "90%" }}>
-        {/* Main Text Card */}
-        <Grid item xs={12} md={6}>
-          <Paper
-            sx={{
-              padding: 3,
-              backgroundColor: "#4A4A5A",
-              color: "#ffffff",
-              borderRadius: "16px",
-              height: "300px",
-              flexDirection: "column",
-              display: "flex",
-            }}
-          >
-            <Typography variant="h6" marginBottom={3}>
-              Saldos
-            </Typography>
-            <div
-              className="scrollable-content"
-              style={{
-                overflowY: "auto",
-                maxHeight: "180px",
-                overflowX: "auto",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {/* Mapeamento da lista */}
-              {formData.listaSaldo.map((item, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    minWidth: "400px",
-                    padding: "4px 0",
-                    borderBottom: "1px solid #ffffff30", // Separador opcional
-                  }}
-                >
-                  {/* Cada campo com tamanho fixo */}
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      width: "130px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {item.banco}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      width: "200px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    C: {item.numero}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      width: "200px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {formatarSaldo(item.saldo)}
-                  </Typography>
-                </Box>
-              ))}
-            </div>
-          </Paper>
-        </Grid>
-
-        {/* Right-Side Cards (Stacked on each other) */}
         <Grid item xs={12} md={6}>
           <Grid container spacing={2}>
-            {/* Top Collaborate Card */}
+            {/* Team Cards */}
             <Grid item xs={12}>
               <Paper
                 sx={{
                   padding: 3,
-                  backgroundColor: "#E3E6F3",
+                  backgroundColor: "#1E1E1E", // Fundo do card principal
+                  color: "#ffffff",
                   borderRadius: "16px",
-                  height: "150px",
+                  height: "200px",
+                  flexDirection: "column",
+                  display: "flex",
                 }}
               >
-                <Typography variant="h4">Collaborate Everywhere.</Typography>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginTop: 2,
-                    backgroundColor: "#8DF35C",
-                    color: "#000000",
+                <Typography variant="h6" marginBottom={3}>
+                  Saldos
+                </Typography>
+                <div
+                  className="scrollable-content"
+                  style={{
+                    overflowY: "auto",
+                    maxHeight: "180px",
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  Download
-                </Button>
+                  {/* Mapeamento da lista */}
+                  {formData.listaSaldo.map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        minWidth: "400px",
+                        padding: "4px 0",
+                        borderBottom: "1px solid #444", // Separador suti
+                      }}
+                    >
+                      {/* Cada campo com tamanho fixo */}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "150px",
+                          color: "#FFA500",
+                        }}
+                      >
+                        {item.banco}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "150px",
+                          color: "#AAAAAA",
+                        }}
+                      >
+                        C: {item.numero}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "180px",
+                          color: "#FFA500", // Verde para valor
+                        }}
+                      >
+                        {formatarSaldo(item.saldo)}
+                      </Typography>
+                    </Box>
+                  ))}
+                </div>
               </Paper>
             </Grid>
-
-            {/* Team Cards */}
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <Paper
                 sx={{
-                  padding: 2,
+                  padding: 3,
                   backgroundColor: "#FFFFFF",
                   borderRadius: "16px",
-                  height: "150px",
+                  height: "100px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  backgroundImage: "linear-gradient(45deg, #1D2671, #1E1E1E)", // Aplicação do gradiente azul
                 }}
               >
-                <Typography variant="h6">Léa Herrera</Typography>
-                <Typography variant="subtitle2">UX Designer</Typography>
+                <Typography variant="h5" sx={{ color: "#FFFFFF" }}>
+                  Total Parcelado
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFFFFF" }}>
+                  {formatarSaldo(formData.valortotalParcelado)}
+                </Typography>
               </Paper>
             </Grid>
-
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <Paper
                 sx={{
-                  padding: 2,
-                  backgroundColor: "#DCE3F3",
+                  padding: 3,
+                  backgroundColor: "#E8CEB3",
                   borderRadius: "16px",
-                  height: "150px",
+                  height: "100px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  backgroundImage: "linear-gradient(45deg, #1D2671, #1E1E1E)", // Aplicação do gradiente azul
+                  whiteSpace: "nowrap",
                 }}
               >
-                <Typography variant="h6">Oliver Haller</Typography>
-                <Typography variant="subtitle2">Co-Founder</Typography>
+                <Typography variant="h5" sx={{ color: "#FFFFFF" }}>
+                  Recorrente Mes
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFFFFF" }}>
+                  {formatarSaldo(formData.valortotalRecorrente)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  padding: 3,
+                  borderRadius: "16px",
+                  height: "110px",
+                  color: "#FFFFFF",
+                  backgroundImage: "linear-gradient(45deg, #1D2671, #ff9e00)", // Aplicação do gradiente
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
+                  Despesas/Mes
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFFFFF" }}>
+                  {formatarSaldo(valorTotalMes + valorFaltante)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  padding: 3,
+                  borderRadius: "16px",
+                  height: "110px",
+                  color: "#FFFFFF",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  backgroundImage: "linear-gradient(45deg, #ff9e00, #1E1E1E)", // Aplicação do gradiente
+                }}
+              >
+                <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
+                  Receita/Mes
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFFFFF" }}>
+                  {formatarSaldo(valorReceitaMes)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  padding: 3,
+                  borderRadius: "16px",
+                  height: "110px",
+                  color: "#FFFFFF",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  backgroundImage: "linear-gradient(90deg, #1D2671, #ff9e00)", // Aplicação do gradiente
+                }}
+              >
+                <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
+                  Liquido/Mes
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFFFFF" }}>
+                  {formatarSaldo(
+                    valorTotalMes + valorFaltante - valorReceitaMes
+                  )}
+                </Typography>
               </Paper>
             </Grid>
           </Grid>
         </Grid>
 
-        {/* Lower Cards */}
-        <Grid item xs={6} md={3}>
-          <Paper
-            sx={{
-              padding: 3,
-              backgroundColor: "#E8CEB3",
-              borderRadius: "16px",
-              height: "150px",
-            }}
-          >
-            <Typography variant="h4">Join us if you want!</Typography>
-            <Button
-              variant="contained"
+        {/* Right-Side Cards (Stacked on each other) */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            {/* Team Cards */}
+            <Grid item xs={6} md={4}>
+              <Paper
+                sx={{
+                  padding: 2,
+                  backgroundColor: "#1C1C1C",
+                  borderRadius: "16px",
+                  height: "80px",
+                  flexDirection: "column",
+                  display: "flex",
+                  color: "#FFFFFF",
+                }}
+              >
+                <Typography variant="h6">Receita</Typography>
+                <Typography variant="subtitle1" sx={{ color: "#66BB6A" }}>
+                  {formatarSaldo(valorSaldo)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <Paper
+                sx={{
+                  padding: 2,
+                  backgroundColor: "#1C1C1C",
+                  borderRadius: "16px",
+                  height: "80px",
+                  flexDirection: "column",
+                  display: "flex",
+                  color: "#FFFFFF",
+                }}
+              >
+                <Typography variant="h6">Despesas</Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FF0000" }}>
+                  {formatarSaldo(valorFaltante)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  padding: 2,
+                  backgroundColor: "#1C1C1C",
+                  borderRadius: "16px",
+                  height: "80px",
+                  flexDirection: "column",
+                  display: "flex",
+                  color: "#FFFFFF",
+                }}
+              >
+                <Typography variant="h6">Liquido</Typography>
+                <Typography variant="subtitle1" sx={{ color: "#FFA500" }}>
+                  {formatarSaldo(valorSaldo - valorFaltante)}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper
+                sx={{
+                  padding: 2,
+                  backgroundColor: "#1C1C1C",
+                  borderRadius: "16px",
+                  height: "350px",
+                  flexDirection: "column",
+                  display: "flex",
+                  color: "#FFFFFF",
+                }}
+              >
+                <Typography variant="h6" marginBottom={3}>
+                  Despesas
+                </Typography>
+                <div
+                  className="scrollable-content"
+                  style={{
+                    overflowY: "auto",
+                    maxHeight: "280px",
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {/* Mapeamento da lista */}
+                  {formData.listaDespesa.map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        minWidth: "500px",
+                        padding: "4px 0",
+                        borderBottom: "1px solid #444", // Separador suti
+                      }}
+                    >
+                      {/* Cada campo com tamanho fixo */}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "200px",
+                          color: "#FFA500", // Laranja para descrição
+                        }}
+                      >
+                        {item.descricao}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "90px",
+                          color: "#FF6347",
+                        }}
+                      >
+                        {item.parcela === 0 ? (
+                          <>-</>
+                        ) : (
+                          <>
+                            Parc: {item.parcela}/{item.parcelaTotais}
+                          </>
+                        )}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "120px",
+                          color: "#AAAAAA",
+                        }}
+                      >
+                        Venc:{" "}
+                        {dayjs(item.dataVencimentoParcela).format("DD/MM")}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minWidth: "150px",
+                          color: "#AAAAAA",
+                        }}
+                      >
+                        {formatarSaldo(item.valorParcela)}
+                      </Typography>
+                    </Box>
+                  ))}
+                </div>
+              </Paper>
+            </Grid>
+            {/* Additional Cards */}
+          </Grid>
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid item xs={12}>
+            <Paper
               sx={{
-                marginTop: 2,
-                backgroundColor: "#B35C3F",
+                padding: 2,
+                backgroundColor: "#1C1C1C",
+                borderRadius: "16px",
+                height: "300px",
+                flexDirection: "column",
+                display: "flex",
                 color: "#FFFFFF",
               }}
             >
-              Join Now
-            </Button>
-          </Paper>
+              <Typography variant="h6" marginBottom={3}>
+                Despesas Pagas
+              </Typography>
+              <div
+                className="scrollable-content"
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "250px",
+                  overflowX: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {/* Mapeamento da lista */}
+                {formData.listaExtratoDespesa.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      minWidth: "400px",
+                      padding: "4px 0",
+                      borderBottom: "1px solid #555",
+                    }}
+                  >
+                    {/* Cada campo com tamanho fixo */}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "200px",
+                        color: "#FFA500", // Laranja para descrição
+                      }}
+                    >
+                      {item.despesa}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "80px",
+                        color: "#FF6347",
+                      }}
+                    >
+                      {item.parcela === 0 ? <>-</> : <>Parc: {item.parcela}</>}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Valor: {formatarSaldo(item.valor)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "100px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Pago: {dayjs(item.dataPagamento).format("DD/MM")}
+                    </Typography>
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "100px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Venc: {dayjs(item.dataVencimento).format("DD/MM")}
+                    </Typography>
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Desc: {formatarSaldo(item.valorDesconto)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Juros: {formatarSaldo(item.valorJuros)}
+                    </Typography>
+                  </Box>
+                ))}
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
+            <Paper
+              sx={{
+                padding: 2,
+                backgroundColor: "#1C1C1C",
+                borderRadius: "16px",
+                height: "300px",
+                flexDirection: "column",
+                display: "flex",
+                color: "#FFFFFF",
+              }}
+            >
+              <Typography variant="h6" marginBottom={3}>
+                Cartoes Pendentes
+              </Typography>
+              <div
+                className="scrollable-content"
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "250px",
+                  overflowX: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {/* Mapeamento da lista */}
+                {formData.listaExtratoDespesaCartao.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      minWidth: "400px",
+                      padding: "4px 0",
+                      borderBottom: "1px solid #555",
+                    }}
+                  >
+                    {/* Cada campo com tamanho fixo */}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "200px",
+                        color: "#FFA500", // Laranja para descrição
+                      }}
+                    >
+                      {item.cartao}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Valor: {formatarSaldo(item.valor)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "100px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Pago: {dayjs(item.dataPagamento).format("DD/MM")}
+                    </Typography>
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Desc: {formatarSaldo(item.valorDesconto)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Juros: {formatarSaldo(item.valorJuros)}
+                    </Typography>
+                  </Box>
+                ))}
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
+            <Paper
+              sx={{
+                padding: 2,
+                backgroundColor: "#1C1C1C",
+                borderRadius: "16px",
+                height: "300px",
+                flexDirection: "column",
+                display: "flex",
+                color: "#FFFFFF",
+              }}
+            >
+              <Typography variant="h6" marginBottom={3}>
+                Cartoes Pagos
+              </Typography>
+              <div
+                className="scrollable-content"
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "250px",
+                  overflowX: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {/* Mapeamento da lista */}
+                {formData.listaExtratoDespesaCartao.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      minWidth: "400px",
+                      padding: "4px 0",
+                      borderBottom: "1px solid #555",
+                    }}
+                  >
+                    {/* Cada campo com tamanho fixo */}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "200px",
+                        color: "#FFA500", // Laranja para descrição
+                      }}
+                    >
+                      {item.cartao}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Valor: {formatarSaldo(item.valor)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "100px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Pago: {dayjs(item.dataPagamento).format("DD/MM")}
+                    </Typography>
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Desc: {formatarSaldo(item.valorDesconto)}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        minWidth: "150px",
+                        color: "#AAAAAA",
+                      }}
+                    >
+                      Juros: {formatarSaldo(item.valorJuros)}
+                    </Typography>
+                  </Box>
+                ))}
+              </div>
+            </Paper>
+          </Grid>
         </Grid>
 
-        {/* Additional Cards */}
-        <Grid item xs={6} md={3}>
-          <Paper
-            sx={{
-              padding: 3,
-              backgroundColor: "#FFFFFF",
-              borderRadius: "16px",
-              height: "150px",
-            }}
-          >
-            <Typography variant="h6">Social Media Managers</Typography>
-            <Typography variant="body2">Expert Level</Typography>
-          </Paper>
-        </Grid>
+        {/* Lower Cards */}
       </Grid>
     </Box>
   );

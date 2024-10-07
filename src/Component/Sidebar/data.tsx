@@ -1,5 +1,5 @@
 import { FolderIcon } from "@heroicons/react/24/outline";
-import { Coffee, CoffeeOutlined, LockPerson, MonetizationOn, MonetizationOnOutlined, MonetizationOnRounded, MonetizationOnSharp, MonetizationOnTwoTone, Money, MoneyOffTwoTone, MoneySharp, MoneyTwoTone, PersonPinCircleRounded, RuleFolder, RuleFolderOutlined } from "@mui/icons-material";
+import { Coffee, CoffeeOutlined, LockPerson, MonetizationOn, MonetizationOnOutlined, MonetizationOnRounded, MonetizationOnSharp, MonetizationOnTwoTone, Money, MoneyOffCsredOutlined, MoneyOffOutlined, MoneyOffTwoTone, MoneySharp, MoneyTwoTone, PaymentOutlined, PersonPinCircleRounded, PointOfSaleOutlined, RuleFolder, RuleFolderOutlined } from "@mui/icons-material";
 import { Navigation } from "@toolpad/core";
 
 export const dataSideBar: Navigation = [
@@ -25,6 +25,10 @@ export const dataSideBar: Navigation = [
     icon: <CoffeeOutlined />,
     children: [
       {
+        segment: 'cadastro/cartao',
+        title: 'Cartao',
+      },     
+      {
         segment: 'cadastro/conta',
         title: 'Conta',
       },
@@ -40,6 +44,10 @@ export const dataSideBar: Navigation = [
         segment: 'cadastro/despesa',
         title: 'Despesa',
       },
+      {
+        segment: 'cadastro/despesaCartao',
+        title: 'Despesa Cartao',
+      },
     ],
   },
   {
@@ -53,5 +61,15 @@ export const dataSideBar: Navigation = [
     segment: 'saldo',
     title: 'Saldo',
     icon: <MonetizationOnOutlined />,
+  },
+  {
+    segment: 'cadastro/despesa/extrato',
+    title: 'Pagar Despesa',
+    icon: <PointOfSaleOutlined  />,
+  },
+  {
+    segment: 'cadastro/despesa/extratoCartao',
+    title: 'Pagar Cartao',
+    icon: <PointOfSaleOutlined  />,
   },
 ];

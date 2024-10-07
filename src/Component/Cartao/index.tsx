@@ -24,23 +24,27 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import { iCategoria } from "../../Interface/interface";
+import {  iCartao } from "../../Interface/interface";
 import axios from "axios";
+import dayjs, { Dayjs } from "dayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 
-const Categoria: React.FC = () => {
-  const [formData, setFormData] = useState<iCategoria>({
+const Cartao: React.FC = () => {
+  const [formData, setFormData] = useState<iCartao>({
     id:0,
     descricao: "",
-    movimentacao: "",
+    dataVencimentoCartao: "",
+    dataFechamento: "",
     usuario: {
       id: 1,
       descricao: "",
     },
   });
   const [openModal, setOpenModal] = useState(false);
-  const [listaCategoria, setListaCategoria] = useState<iCategoria[]>([]);
-  const [tipoCategoriaLista, setTipoCategoriaLista] = useState<string[]>([]);
+  const [listaCartao, setListaCartao] = useState<iCartao[]>([]);
+  const [tipoCartaoLista, setTipoCartaoLista] = useState<string[]>([]);
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -56,37 +60,38 @@ const Categoria: React.FC = () => {
     }));
   };
 
-  const handleSelect = (event: React.SyntheticEvent, value: iCategoria | null) => {
+  const handleSelect = (event: React.SyntheticEvent, value: iCartao | null) => {
     if (value) {
       setFormData({
         id: value.id,
-        movimentacao: value.movimentacao,
+        dataVencimentoCartao: value.dataVencimentoCartao,
+        dataFechamento: value.dataFechamento,
         descricao: value.descricao,
         usuario: value.usuario
       });
     }
   };
 
-  const buscarCategoria = async () => {
+  const buscarCartao = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/categoria/todos",
+        "http://localhost:8080/cartao/todos",
         {
           params: {
             idUsuario: 1,
           },
         }
       );
-      setListaCategoria(response.data);
+      setListaCartao(response.data);
     } catch (error) {
-      console.error("Erro ao buscar categoria:", error);
+      console.error("Erro ao buscar cartao:", error);
     }
   };
 
   // Buscar a lista de bancos ao abrir o modal
   useEffect(() => {
-    if (openModal && listaCategoria.length==0) {
-      buscarCategoria();
+    if (openModal && listaCartao.length==0) {
+      buscarCartao();
     }
   }, [openModal]);
 
@@ -112,20 +117,10 @@ const Categoria: React.FC = () => {
 
     let isValid = true;
 
-    if (!formData.descricao) {
-      setSnackbarMessage("Descrição é obrigatória");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-    }
-    if (!formData.movimentacao) {
-      setSnackbarMessage("Movimentaçao é obrigatória");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-    }
 
     if (isValid) {
       try {
-        const response = await fetch("http://localhost:8080/categoria", {
+        const response = await fetch("http://localhost:8080/cartao", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -137,7 +132,7 @@ const Categoria: React.FC = () => {
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
           handleReset()
-          buscarCategoria();
+          buscarCartao();
         } else {
           // Erro
           const errorText = await response.text();
@@ -168,48 +163,15 @@ const Categoria: React.FC = () => {
     setFormData({
       id:0,
       descricao: "",
-      movimentacao: "",
+      dataVencimentoCartao: "",
+      dataFechamento: "",
       usuario: {
         id: 1,
         descricao: "",
       },
     });
   };
-
-  async function buscarTipoCategoria() {
-    try {
-      const response = await fetch(
-        "http://localhost:8080/categoria/tipoCategoria",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setTipoCategoriaLista(data);
-      } else {
-        // Erro
-        const errorText = await response.text();
-        setSnackbarMessage("Erro ao buscar Tipo ");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
-      }
-    } catch (error) {
-      console.error("Erro:", error);
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-    }
-  }
-
-  useEffect(
-    () => {
-      buscarTipoCategoria();
-    },
-    [ ]
-  );
+  
 
   return (
     <Box
@@ -231,12 +193,12 @@ const Categoria: React.FC = () => {
       >
         <Breadcrumbs separator="›" aria-label="breadcrumbs">
           <Typography>Cadastro</Typography>
-          <Typography>Categoria</Typography>
+          <Typography>Cartao</Typography>
         </Breadcrumbs>
 
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
-            <Grid item xs={12} md={9}>
+            <Grid item xs={12} md={8}>
               <TextField
                 label="Descrição"
                 name="descricao"
@@ -247,28 +209,30 @@ const Categoria: React.FC = () => {
                 variant="outlined"
               />
             </Grid>
-
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel id="tipoCategoria-label">
-                  Tipo de Categoria
-                </InputLabel>
-                <Select
-                  labelId="tipoCategoria-label"
-                  id="tipoCategoria"
-                  name="movimentacao"
-                  value={formData.movimentacao}
-                  onChange={handleSelectChange}
-                  label="Tipo de Categoria"
-                >
-                  {tipoCategoriaLista.map((tipo, index) => (
-                    <MenuItem key={index} value={tipo}>
-                      {tipo}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+        <Grid item xs={12} md={2}>
+              <TextField
+                label="Data Vencimento Fatura"
+                name="dataVencimentoCartao"
+                value={formData.dataVencimentoCartao}
+                onChange={handleTextFieldChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
             </Grid>
+        <Grid item xs={12} md={2}>
+              <TextField
+                label="Data Fechamento Fatura"
+                name="dataFechamento"
+                value={formData.dataFechamento}
+                onChange={handleTextFieldChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+            </Grid>
+
+           
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -300,11 +264,11 @@ const Categoria: React.FC = () => {
           sx: { width: "80%", height: "40%" },
         }}
       >
-        <DialogTitle>Selecionar Categoria</DialogTitle>
+        <DialogTitle>Selecionar Cartao</DialogTitle>
         <DialogContent>
           <FormControl   fullWidth>
            <Autocomplete
-            options={listaCategoria}
+            options={listaCartao}
             getOptionLabel={(option) => `${option.descricao}`}
             renderInput={(params) => (
               <TextField {...params} label="Buscar por Código ou Descrição" fullWidth margin="dense" />
@@ -339,4 +303,4 @@ const Categoria: React.FC = () => {
   );
 };
 
-export default Categoria;
+export default Cartao;

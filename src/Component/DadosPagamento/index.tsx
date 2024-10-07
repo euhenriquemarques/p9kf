@@ -22,6 +22,11 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  Autocomplete,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import {
   iBanco,
@@ -44,6 +49,10 @@ const DadosPagamento: React.FC = () => {
         id: 0,
         descricao: "",
         movimentacao: "",
+        usuario: {
+          id: 1,
+          descricao: "",
+        },
       },
       usuario: {
         id: 1,
@@ -63,12 +72,56 @@ const DadosPagamento: React.FC = () => {
   });
 
   const [despesasLista, setDespesasLista] = useState<iDespesas[]>([]);
-
+  const [dadosPagamentoLista, setDadosPagamentoListas] = useState<iDadosPagamento[]>([]);
+  const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+
+  const handleSelect = (event: React.SyntheticEvent, value: iDadosPagamento | null) => {
+    if (value) {
+      setFormData({
+        id: value.id,
+        descricao: value.descricao,
+        despesa: value.despesa,
+        dadosPagamento: value.dadosPagamento,
+      })
+    }
+  };
+
+  const buscarDadosPagamento = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/dadosPagamento",
+        {
+          params: {
+            idUsuario: 1,
+          },
+        }
+      );
+      setDadosPagamentoListas(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar categoria:", error);
+    }
+  };
+
+  // Buscar a lista de bancos ao abrir o modal
+  useEffect(() => {
+    if (openModal && dadosPagamentoLista.length==0) {
+      buscarDadosPagamento();
+    }
+  }, [openModal]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const { name, value } = e.target;
@@ -111,6 +164,7 @@ const DadosPagamento: React.FC = () => {
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
           handleReset();
+          buscarDadosPagamento()
         } else {
           // Erro
           const errorText = await response.text();
@@ -148,6 +202,10 @@ const DadosPagamento: React.FC = () => {
           id: 0,
           descricao: "",
           movimentacao: "",
+          usuario: {
+            id: 1,
+            descricao: "",
+          },
         },
         usuario: {
           id: 1,
@@ -198,7 +256,6 @@ const DadosPagamento: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#f5f5f5",
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
@@ -269,12 +326,15 @@ const DadosPagamento: React.FC = () => {
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button variant="outlined" onClick={handleOpenModal}>
+              Buscar 
+            </Button>
             <Button
               type="button"
               onClick={handleReset}
               variant="outlined"
               color="secondary"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2 ,ml: 1 }}
             >
               Cancelar
             </Button>
@@ -285,6 +345,47 @@ const DadosPagamento: React.FC = () => {
         </form>
       </Card>
       <Divider />
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: { width: "80%", height: "40%" },
+        }}
+      >
+        <DialogTitle>Selecionar Dados Pagamento</DialogTitle>
+        <DialogContent>
+        <FormControl fullWidth>
+      <Autocomplete
+        options={dadosPagamentoLista}
+        getOptionLabel={(option) =>
+          `${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`
+        }
+        renderOption={(props, option) => (
+          <li {...props} key={option.id}>
+            {`${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`}
+          </li>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Buscar por Banco, Agência ou Número"
+            fullWidth
+            margin="dense"
+          />
+        )}
+        onChange={handleSelect}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+      />
+    </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} variant="contained">
+            Aplicar
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar para Feedback */}
       <Snackbar
         open={openSnackbar}

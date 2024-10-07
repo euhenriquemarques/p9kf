@@ -20,7 +20,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { iCategoria, iDespesas } from "../../Interface/interface";
+import { iCartao, iDespesaCartao } from "../../Interface/interface";
 import axios from "axios";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,14 +28,15 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import dayjs, { Dayjs } from "dayjs";
-import 'dayjs/locale/pt-br';
-const Despesa: React.FC = () => {
-  const [formData, setFormData] = useState<iDespesas>({
+import "dayjs/locale/pt-br";
+const DespesaCartao: React.FC = () => {
+  const [formData, setFormData] = useState<iDespesaCartao>({
     id: 0,
-    categoria: {
+    cartao: {
       id: 0,
       descricao: "",
-      movimentacao: "",
+      dataVencimentoCartao: "",
+      dataFechamento: "",
       usuario: {
         id: 1,
         descricao: "",
@@ -49,16 +50,14 @@ const Despesa: React.FC = () => {
     recorrente: false,
     parcela: 1,
     parcelaTotais: 1,
-    dataVencimentoParcela: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-    juros: false,
+    dataCompra: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
     ativo: true,
     valorParcela: 0,
     valorTotal: 0,
     descricao: "",
   });
 
-  const [categoriaLista, setCategoriaLista] = useState<iCategoria[]>([]);
-
+  const [cartaoLista, setCartaoLista] = useState<iCartao[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -68,7 +67,7 @@ const Despesa: React.FC = () => {
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const { name, value } = e.target;
 
-    const selecionado = categoriaLista.find(
+    const selecionado = cartaoLista.find(
       (item) => item.id === Number(value)
     );
     setFormData((prevState) => ({
@@ -136,15 +135,14 @@ const Despesa: React.FC = () => {
       .replace("$", "$ "); // Adiciona um espaço após o símbolo $
   };
 
-
   const handleDateChange = (newValue: Dayjs | null, name: string) => {
     if (newValue) {
       setFormData((prevState) => ({
         ...prevState,
-        [name]: newValue.format("YYYY-MM-DDTHH:mm:ss"), 
+        [name]: newValue.format("YYYY-MM-DDTHH:mm:ss"),
       }));
+    }
   };
-}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,7 +152,7 @@ const Despesa: React.FC = () => {
 
     if (isValid) {
       try {
-        const response = await fetch("http://localhost:8080/despesa", {
+        const response = await fetch("http://localhost:8080/despesaCartao", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -195,10 +193,11 @@ const Despesa: React.FC = () => {
   const handleReset = () => {
     setFormData({
       id: 0,
-      categoria: {
+      cartao: {
         id: 0,
         descricao: "",
-        movimentacao: "",
+        dataVencimentoCartao: "",
+      dataFechamento: "",
         usuario: {
           id: 1,
           descricao: "",
@@ -212,8 +211,7 @@ const Despesa: React.FC = () => {
       recorrente: false,
       parcela: 1,
       parcelaTotais: 1,
-      dataVencimentoParcela: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-      juros: false,
+      dataCompra: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
       ativo: true,
       valorParcela: 0,
       valorTotal: 0,
@@ -221,10 +219,10 @@ const Despesa: React.FC = () => {
     });
   };
 
-  async function buscarDespesasVigentes() {
+  async function buscarCartoes() {
     try {
       const response = await axios.get(
-        "http://localhost:8080/categoria/despesa",
+        "http://localhost:8080/cartao/todos",
         {
           params: {
             idUsuario: 1,
@@ -233,11 +231,11 @@ const Despesa: React.FC = () => {
       );
       if (response.status === 200) {
         const data = await response.data;
-        setCategoriaLista(data);
+        setCartaoLista(data);
       } else {
         // Erro
         const errorText = await response.status;
-        setSnackbarMessage("Erro ao buscar Bancos ");
+        setSnackbarMessage("Erro ao buscar Cartoes ");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -249,7 +247,7 @@ const Despesa: React.FC = () => {
   }
 
   useEffect(() => {
-    buscarDespesasVigentes();
+    buscarCartoes();
   }, []);
 
   return (
@@ -272,23 +270,23 @@ const Despesa: React.FC = () => {
       >
         <Breadcrumbs separator="›" aria-label="breadcrumbs">
           <Typography>Cadastro</Typography>
-          <Typography>Despesa</Typography>
+          <Typography>DespesaCartao</Typography>
         </Breadcrumbs>
 
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
             <Grid item xs={12} md={4}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel id="despesa-label">Categoria</InputLabel>
+                <InputLabel id="despesacartao-label">Cartao</InputLabel>
                 <Select
-                  labelId="categoria-label"
-                  id="categoria"
-                  name="categoria"
-                  value={formData.categoria.id}
+                  labelId="cartao-label"
+                  id="cartao"
+                  name="cartao"
+                  value={formData.cartao.id}
                   onChange={handleSelectChange}
-                  label="Categoria"
+                  label="Cartao"
                 >
-                  {categoriaLista.map((tipo, index) => (
+                  {cartaoLista.map((tipo, index) => (
                     <MenuItem key={index} value={tipo.id}>
                       {tipo.descricao}
                     </MenuItem>
@@ -364,7 +362,7 @@ const Despesa: React.FC = () => {
                 label="Valor Parcela Atual"
                 name="valorParcela"
                 type="text"
-                value={formatCurrency(formData.valorParcela)} // Aplica formatação para exibição
+                value={formatCurrency(formData.valorParcela)}  
                 onChange={handleTextFieldChangeTotal}
                 fullWidth
                 required
@@ -384,18 +382,23 @@ const Despesa: React.FC = () => {
                 inputProps={{ min: 0 }}
               />
             </Grid>
-            <Grid item xs={12} md={3} sx={{ display: 'flex', alignItems: 'center' }}> {/* Alinhamento vertical */}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Vencimento Parcela Atual"
-                    value={dayjs(formData.dataVencimentoParcela)}
-                    onChange={(newValue) =>
-                      handleDateChange(newValue, "dataVencimentoParcela")
-                    }
-                    format="DD/MM/YYYY" // Formato com data e hora
-                    minDate={dayjs()} 
-                  
-                  />
+            <Grid
+              item
+              xs={12}
+              md={3}
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              {" "}
+              {/* Alinhamento vertical */}
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Data Compra"
+                  value={dayjs(formData.dataCompra)}
+                  onChange={(newValue) =>
+                    handleDateChange(newValue, "dataCompra")
+                  }
+                  format="DD/MM/YYYY" // Formato com data e hora
+                />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} md={2}>
@@ -421,30 +424,6 @@ const Despesa: React.FC = () => {
                 </RadioGroup>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth variant="outlined">
-                <FormLabel id="juros-label">Juros Atraso</FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="juros-label"
-                  name="juros"
-                  value={formData.juros}
-                  onChange={handleTextFieldChange}
-                >
-                  <FormControlLabel
-                    value={true}
-                    control={<Radio />}
-                    label="Sim"
-                  />
-                  <FormControlLabel
-                    value={false}
-                    control={<Radio />}
-                    label="Não"
-                  />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-            
           </Grid>
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -483,4 +462,4 @@ const Despesa: React.FC = () => {
   );
 };
 
-export default Despesa;
+export default DespesaCartao;

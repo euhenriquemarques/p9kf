@@ -15,6 +15,9 @@ import Saldo from "./Component/Saldo";
 import DashboardLayoutBasic from "./Component/Sidebar/sidebar";
 import NotFound from "./Pages/404/notFound";
 import HomePage from "./Component/Dashboard";
+import Cartao from "./Component/Cartao";
+import DespesaCartao from "./Component/DespesaCartao";
+import ExtratoDespesaCartao from "./Component/ExtratoDespesaCartao";
 
 const App: React.FC = () => {
   return (
@@ -41,10 +44,13 @@ const App: React.FC = () => {
               {/* Sub-rotas dentro de Dashboard */}
               <Route path="/cadastro/adm" element={ <> <Banco />  <Usuario /> </>} />
               <Route path="/cadastro/categoria" element={<Categoria />} />
+              <Route path="/cadastro/cartao" element={<Cartao />} />
               <Route path="/cadastro/conta" element={<Conta />} />
               <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
               <Route path="/cadastro/despesa" element={<Despesa />} />
+              <Route path="/cadastro/despesaCartao" element={<DespesaCartao />} />
               <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
+              <Route path="/cadastro/despesa/extratoCartao" element={<ExtratoDespesaCartao />} />
               <Route path="/saldo" element={<Saldo />} />
             </Route>
                   {/* Rota 404 */}

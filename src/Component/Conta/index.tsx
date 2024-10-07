@@ -235,7 +235,6 @@ const Conta: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#f5f5f5",
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",

@@ -10,6 +10,15 @@ export  interface iBanco {
     id: number;
     descricao: string;
     movimentacao: string;
+    usuario: iUsuario;
+  }
+  
+  export interface iCartao {
+    id: number;
+    descricao: string;
+    dataVencimentoCartao: string;
+    dataFechamento: string;
+    usuario: iUsuario;
   }
   
   export interface iUsuario {
@@ -68,6 +77,21 @@ export  interface iBanco {
     descricao: string;
   }
   
+  export interface iDespesaCartao {
+    id: number;
+    cartao: iCartao;
+    usuario: iUsuario;
+    dataProcessamento: string;
+    recorrente: boolean;
+    parcela: number;
+    parcelaTotais: number;
+    dataCompra: string;
+    ativo: boolean;
+    valorParcela: number;
+    valorTotal: number;
+    descricao: string;
+  }
+  
 
   
   export interface iExtratoDespesa {
@@ -76,6 +100,17 @@ export  interface iBanco {
     valorJuros:number,
     valorDesconto:number,
     despesa:iDespesas,
+    usuario: iUsuario;
+    dataProcessamento: string;
+    dataPagamento: Dayjs | string;
+  }
+  
+  export interface iExtratoDespesaCartao {
+    id: number;
+    valor:number,
+    valorJuros:number,
+    valorDesconto:number,
+    cartao :iCartao,
     usuario: iUsuario;
     dataProcessamento: string;
     dataPagamento: Dayjs | string;
@@ -90,7 +125,12 @@ export  interface iBanco {
 
   export interface iHomeDto {
     listaSaldo: iSaldoDto[],
-    listaDespesas: iDespesasDto[],
+    listaDespesa: iDespesasDto[],
+    listaExtratoDespesa: iExtratoDespesasDto[],
+    listaExtratoDespesaCartao: iExtratoDespesaCartaoDto[],
+    listaDespesaCartao: iDespesasCartaoDto[],
+    valortotalParcelado: number,
+    valortotalRecorrente: number,
   }
 
   export interface iSaldoDto {
@@ -98,6 +138,13 @@ export  interface iBanco {
     banco:string,
     numero:string,
   
+  }
+  export interface iExtratoDespesaCartaoDto {
+    dataPagamento: Dayjs | string;
+    cartao:string,
+    valor:number,
+    valorJuros: number;
+    valorDesconto: number;
   }
   
   export interface iDespesasDto {
@@ -107,5 +154,21 @@ export  interface iBanco {
     valorParcela: number;
     descricao: string;
 
-  }
+  }    
+  export interface iDespesasCartaoDto {
+    valor: number;
+    descricao: string;
+
+  }  
+  export interface iExtratoDespesasDto {
+    parcela: number;
+    valor: number;
+    valorJuros: number;
+    dataPagamento: string;
+    dataVencimento: string;
+    valorDesconto: number;
+    despesa: string;
+
+  }  
+
   

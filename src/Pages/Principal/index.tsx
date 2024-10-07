@@ -9,7 +9,12 @@ interface PrincipalProps {
 
 const Principal: React.FC<PrincipalProps> = ({ children }) => {
   return (
-    <Box className="bg-gray-100 min-h-screen"   >
+    <Box
+      className="min-h-screen"
+      sx={{
+        backgroundColor: "#181818", // Fundo geral da página
+      }}
+    >
       {children} {/* Renderiza qualquer children passado para `Principal` */}
       <Outlet /> {/* Renderiza as sub-rotas */}
     </Box>

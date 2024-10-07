@@ -6,11 +6,12 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { Navigation, Session } from '@toolpad/core';
-import { dataSideBar } from '../Menu/data';
+import { dataSideBar } from './data';
 import "./style.css";
 import { log } from 'console';
 
 const NAVIGATION: Navigation = dataSideBar;
+
 
 const demoTheme = createTheme({
   typography: {
@@ -52,6 +53,27 @@ export default function DashboardLayoutBasic(props: DemoProps) {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  // 2. Fechar a sidebar ao clicar fora dela
+  const sidebarRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setSidebarOpen(false);
+      }
+    }
+
+    // Adiciona o event listener
+    window.addEventListener('mousedown', handleClickOutside);
+
+    // Remove o listener ao desmontar o componente
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
 
   const router = React.useMemo(() => {
     return {
@@ -67,14 +89,19 @@ export default function DashboardLayoutBasic(props: DemoProps) {
     };
   }, [location, navigate]);
 
+  
+
   return (
     
     <AppProvider  navigation={NAVIGATION} router={router} theme={demoTheme}  branding={{
       title: "NestEgg",
       logo: <span style={{ display: 'none' }} />,}}>
-      <DashboardLayout>
+        <div ref={sidebarRef}>
+        <DashboardLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+       
         {children}
-      </DashboardLayout>
+        </DashboardLayout>
+        </div>
     </AppProvider>
   );
 }
