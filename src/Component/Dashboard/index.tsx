@@ -8,7 +8,8 @@ const HomePage: React.FC = () => {
   const [formData, setFormData] = useState<iHomeDto>({
     valortotalParcelado: 0,
     valortotalRecorrente: 0,
-    listaDespesaCartao: [{ valor: 0, descricao: "" }],
+    listaDespesaCartao: [{ valor: 0, cartao: "", ano: "", meses: [] }],
+    listaDespesaCartao12Meses: [{ valor: 0, cartao: "", ano: "", meses: [] }],
     listaDespesa: [
       {
         parcela: 1,
@@ -556,6 +557,133 @@ const HomePage: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid item xs={12}>
+            <Paper
+              sx={{
+                padding: 2,
+                backgroundColor: "#1C1C1C",
+                borderRadius: "16px",
+                height: "300px",
+                flexDirection: "column",
+                display: "flex",
+                color: "#FFFFFF",
+              }}
+            >
+              <Typography variant="h6" marginBottom={3}>
+                Cartão Mensal
+              </Typography>
+
+              {/* Cabeçalho com os meses */}
+              <Box
+              className="scrollable-content"
+                sx={{
+                  display: "flex",
+                  borderBottom: "1px solid #555",
+                  paddingBottom: "8px",
+                  overflowY: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {/* Coluna para o título "Cartão" */}
+                <Typography
+                  variant="body1"
+                  sx={{
+                    maxWidth: "250px",
+                    minWidth: "200px",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  Cartão
+                </Typography>
+
+                {/* Mapeamento dos meses para a linha de cabeçalho */}
+                {formData.listaDespesaCartao12Meses.length > 0 &&
+                  (() => {
+                    const itemComMaisMeses =
+                      formData.listaDespesaCartao12Meses.reduce((acc, item) => {
+                        return Object.keys(item.meses).length >
+                          Object.keys(acc.meses).length
+                          ? item
+                          : acc;
+                      });
+
+                    return Object.keys(itemComMaisMeses.meses).map(
+                      (mesAno, i) => (
+                        <Typography
+                          key={i}
+                          variant="body1"
+                          sx={{
+                            minWidth: "130px",
+                            textAlign: "center",
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          {mesAno}
+                        </Typography>
+                      )
+                    );
+                  })()}
+              </Box>
+              <div
+                className="scrollable-content"
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "350px",
+                  overflowX: "auto",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {/* Mapeamento da lista de cartões e valores */}
+                {formData.listaDespesaCartao12Meses.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      minWidth: "500px",
+                      padding: "4px 0",
+                      borderBottom: "1px solid #555",
+                    }}
+                  >
+                    {/* Coluna para o nome do cartão */}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        maxWidth: "200px",
+                        minWidth: "200px",
+                        color: "#FFA500", // Laranja para o nome do cartão
+                      }}
+                    >
+                      {item.cartao}
+                    </Typography>
+
+                    {/* Exibe os meses e valores para cada cartão */}
+                    {Object.entries(item.meses).map(([mesAno, valorMes], i) => (
+                      <Box
+                        key={i}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center", // Centraliza o texto
+                          minWidth: "130px",
+                        }}
+                      >
+                        <Typography
+                          variant="body2" // Usando body2 para o valor
+                          sx={{
+                            color: "#AAAAAA", // Cor do valor
+                          }}
+                        >
+                          {formatarSaldo(Number(valorMes))}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                ))}
+              </div>
+            </Paper>
+          </Grid>
+        </Grid>
         <Grid item xs={12} md={6}>
           <Grid item xs={12}>
             <Paper
@@ -582,7 +710,7 @@ const HomePage: React.FC = () => {
                 }}
               >
                 {/* Mapeamento da lista */}
-                {formData.listaExtratoDespesaCartao.map((item, index) => (
+                {formData.listaDespesaCartao.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -611,34 +739,6 @@ const HomePage: React.FC = () => {
                       }}
                     >
                       Valor: {formatarSaldo(item.valor)}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        minWidth: "100px",
-                        color: "#AAAAAA",
-                      }}
-                    >
-                      Pago: {dayjs(item.dataPagamento).format("DD/MM")}
-                    </Typography>
-
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        minWidth: "150px",
-                        color: "#AAAAAA",
-                      }}
-                    >
-                      Desc: {formatarSaldo(item.valorDesconto)}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        minWidth: "150px",
-                        color: "#AAAAAA",
-                      }}
-                    >
-                      Juros: {formatarSaldo(item.valorJuros)}
                     </Typography>
                   </Box>
                 ))}
@@ -736,6 +836,8 @@ const HomePage: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
+
+
 
         {/* Lower Cards */}
       </Grid>

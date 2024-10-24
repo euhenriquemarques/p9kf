@@ -76,6 +76,22 @@ export  interface iBanco {
     valorTotal: number;
     descricao: string;
   }
+
+  export interface iReceitas {
+    id: number;
+    categoria: iCategoria;
+    usuario: iUsuario;
+    dataProcessamento: string;
+    recorrente: boolean;
+    parcela: number;
+    parcelaTotais: number;
+    dataVencimentoParcela: string;
+    ativo: boolean;
+    valorParcela: number;
+    valorTotal: number;
+    descricao: string;
+  }
+  
   
   export interface iDespesaCartao {
     id: number;
@@ -129,6 +145,7 @@ export  interface iBanco {
     listaExtratoDespesa: iExtratoDespesasDto[],
     listaExtratoDespesaCartao: iExtratoDespesaCartaoDto[],
     listaDespesaCartao: iDespesasCartaoDto[],
+    listaDespesaCartao12Meses: iDespesasCartaoDto[],
     valortotalParcelado: number,
     valortotalRecorrente: number,
   }
@@ -157,7 +174,9 @@ export  interface iBanco {
   }    
   export interface iDespesasCartaoDto {
     valor: number;
-    descricao: string;
+    cartao: string;
+    meses:  [];
+    ano: string;
 
   }  
   export interface iExtratoDespesasDto {

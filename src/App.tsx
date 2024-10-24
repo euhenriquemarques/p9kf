@@ -18,6 +18,7 @@ import HomePage from "./Component/Dashboard";
 import Cartao from "./Component/Cartao";
 import DespesaCartao from "./Component/DespesaCartao";
 import ExtratoDespesaCartao from "./Component/ExtratoDespesaCartao";
+import Receita from "./Component/Receita";
 
 const App: React.FC = () => {
   return (
@@ -48,6 +49,7 @@ const App: React.FC = () => {
               <Route path="/cadastro/conta" element={<Conta />} />
               <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
               <Route path="/cadastro/despesa" element={<Despesa />} />
+              <Route path="/cadastro/receita" element={<Receita />} />
               <Route path="/cadastro/despesaCartao" element={<DespesaCartao />} />
               <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
               <Route path="/cadastro/despesa/extratoCartao" element={<ExtratoDespesaCartao />} />

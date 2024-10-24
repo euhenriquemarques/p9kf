@@ -20,35 +20,32 @@ export const dataSideBar: Navigation = [
     title: 'Cadastro',
   },
   {
-    segment: '/cadastro',
-    title: 'Cadastros',
-    icon: <CoffeeOutlined />,
-    children: [
-      {
-        segment: 'cadastro/cartao',
-        title: 'Cartao',
-      },     
-      {
-        segment: 'cadastro/conta',
-        title: 'Conta',
-      },
-      {
-        segment: 'cadastro/categoria',
-        title: 'Categoria',
-      },
-      {
-        segment: 'cadastro/dadosPagamento',
-        title: 'Dados Pagamento',
-      },
-      {
-        segment: 'cadastro/despesa',
-        title: 'Despesa',
-      },
-      {
-        segment: 'cadastro/despesaCartao',
-        title: 'Despesa Cartao',
-      },
-    ],
+    segment: 'cadastro/cartao',
+    title: 'Cartao',
+  },     
+  {
+    segment: 'cadastro/conta',
+    title: 'Conta',
+  },
+  {
+    segment: 'cadastro/categoria',
+    title: 'Categoria',
+  },
+  {
+    segment: 'cadastro/dadosPagamento',
+    title: 'Dados Pagamento',
+  },
+  {
+    segment: 'cadastro/despesa',
+    title: 'Despesa',
+  },  
+  {
+    segment: 'cadastro/receita',
+    title: 'Receita',
+  },
+  {
+    segment: 'cadastro/despesaCartao',
+    title: 'Despesa Cartao',
   },
   {
     kind: 'divider',

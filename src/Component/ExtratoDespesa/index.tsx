@@ -340,6 +340,7 @@ const ExtratoDespesa: React.FC = () => {
                 name="valorJuros"
                 type="text"
                 value={formatCurrency(formData.valorJuros)}
+                onChange={handleTextFieldChangeTotal}
                 fullWidth
                 required
                 variant="outlined"
@@ -352,6 +353,7 @@ const ExtratoDespesa: React.FC = () => {
                 name="valorDesconto"
                 type="text"
                 value={formatCurrency(formData.valorDesconto)}
+                onChange={handleTextFieldChangeTotal}
                 fullWidth
                 required
                 variant="outlined"
