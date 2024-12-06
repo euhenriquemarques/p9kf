@@ -27,6 +27,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableSortLabel,
 } from "@mui/material";
 import {
   iBanco,
@@ -37,6 +46,8 @@ import {
 } from "../../Interface/interface";
 import { log } from "console";
 import axios from "axios";
+import dayjs from "dayjs";
+import { stableSort, getComparator } from "../../Utils/sortUtils";
 
 const DadosPagamento: React.FC = () => {
   const [formData, setFormData] = useState<iDadosPagamento>({
@@ -72,7 +83,9 @@ const DadosPagamento: React.FC = () => {
   });
 
   const [despesasLista, setDespesasLista] = useState<iDespesas[]>([]);
-  const [dadosPagamentoLista, setDadosPagamentoListas] = useState<iDadosPagamento[]>([]);
+  const [dadosPagamentoLista, setDadosPagamentoListas] = useState<
+    iDadosPagamento[]
+  >([]);
   const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -80,21 +93,24 @@ const DadosPagamento: React.FC = () => {
     "success"
   );
 
-  const handleSelect = (event: React.SyntheticEvent, value: iDadosPagamento | null) => {
+  const handleSelect = (
+    event: React.SyntheticEvent,
+    value: iDadosPagamento | null
+  ) => {
     if (value) {
       setFormData({
         id: value.id,
         descricao: value.descricao,
         despesa: value.despesa,
         dadosPagamento: value.dadosPagamento,
-      })
+      });
     }
   };
 
   const buscarDadosPagamento = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/dadosPagamento",
+        "http://localhost:8080/dadosPagamento/vigente",
         {
           params: {
             idUsuario: 1,
@@ -109,7 +125,7 @@ const DadosPagamento: React.FC = () => {
 
   // Buscar a lista de bancos ao abrir o modal
   useEffect(() => {
-    if (openModal && dadosPagamentoLista.length==0) {
+    if (openModal && dadosPagamentoLista.length == 0) {
       buscarDadosPagamento();
     }
   }, [openModal]);
@@ -148,7 +164,6 @@ const DadosPagamento: React.FC = () => {
 
     let isValid = true;
     console.log(formData);
-    
 
     if (isValid) {
       try {
@@ -164,7 +179,7 @@ const DadosPagamento: React.FC = () => {
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
           handleReset();
-          buscarDadosPagamento()
+          buscarDadosPagamento();
         } else {
           // Erro
           const errorText = await response.text();
@@ -227,11 +242,14 @@ const DadosPagamento: React.FC = () => {
 
   async function buscarDespesasVigentes() {
     try {
-      const response = await axios.get("http://localhost:8080/despesa/geralVigentes", {
-        params: {
-          idUsuario: 1,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:8080/despesa/geralVigentes",
+        {
+          params: {
+            idUsuario: 1,
+          },
+        }
+      );
       if (response.status === 200) {
         const data = await response.data;
         setDespesasLista(data);
@@ -249,159 +267,185 @@ const DadosPagamento: React.FC = () => {
     }
   }
 
+  const cancelarDadosPagamento = async () => {
+    try {
+      const response = await axios.delete(
+        "http://localhost:8080/dadosPagamento/cancelar",
+        {
+          params: {
+            id: formData.id,
+          },
+        }
+      );
+      buscarDespesasVigentes();
+      handleReset();
+      buscarDadosPagamento();
+    } catch (error) {
+      console.error("Erro ao Cancelar Dados:", error);
+    }
+  };
+
   useEffect(() => {
     buscarDespesasVigentes();
   }, []);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        padding: 2,
-      }}
-    >
-      <Card
+    <>
+      <Box
         sx={{
-          maxWidth: "90%",
-          width: "100%",
-          p: 3,
-          boxShadow: 1,
-          borderRadius: 3,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          padding: 2,
         }}
       >
-        <Breadcrumbs separator="›" aria-label="breadcrumbs">
-          <Typography>Cadastro</Typography>
-          <Typography>Dados Pagamento</Typography>
-        </Breadcrumbs>
-
-        <form onSubmit={handleSubmit}>
-        <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
-
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth variant="outlined">
-              <InputLabel id="despesa-label">Despesa</InputLabel>
-              <Select
-                labelId="despesa-label"
-                id="despesa"
-                name="despesa"
-                value={formData.despesa?.id}
-                onChange={handleSelectChange}
-                label="Despesa"
-              >
-                {despesasLista.map((tipo, index) => (
-                  <MenuItem key={index} value={tipo.id}>
-                    {tipo.descricao}| Parcela - {tipo.parcela}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-        
-            <Grid item xs={12} md={3}>
-              <TextField
-                label="Descriçao"
-                name="descricao"
-                value={formData.descricao}
-                onChange={handleTextFieldChange}
-                fullWidth
-                required
-                variant="outlined"
-              />
-            </Grid>
-
-            <Grid item xs={12} md={5}>
-              <TextField
-                label="Dados Pagamento"
-                name="dadosPagamento"
-                value={formData.dadosPagamento}
-                onChange={handleTextFieldChange}
-                fullWidth
-                required
-                variant="outlined"
-              />
-            </Grid>
-          </Grid>
-
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="outlined" onClick={handleOpenModal}>
-              Buscar 
-            </Button>
-            <Button
-              type="button"
-              onClick={handleReset}
-              variant="outlined"
-              color="secondary"
-              sx={{ mr: 2 ,ml: 1 }}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Salvar
-            </Button>
-          </Box>
-        </form>
-      </Card>
-      <Divider />
-      <Dialog
-        open={openModal}
-        onClose={handleCloseModal}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          sx: { width: "80%", height: "40%" },
-        }}
-      >
-        <DialogTitle>Selecionar Dados Pagamento</DialogTitle>
-        <DialogContent>
-        <FormControl fullWidth>
-      <Autocomplete
-        options={dadosPagamentoLista}
-        getOptionLabel={(option) =>
-          `${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`
-        }
-        renderOption={(props, option) => (
-          <li {...props} key={option.id}>
-            {`${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`}
-          </li>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Buscar por Banco, Agência ou Número"
-            fullWidth
-            margin="dense"
-          />
-        )}
-        onChange={handleSelect}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-      />
-    </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseModal} variant="contained">
-            Aplicar
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* Snackbar para Feedback */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+        <Card
+          sx={{
+            maxWidth: "90%",
+            width: "100%",
+            p: 3,
+            boxShadow: 1,
+            borderRadius: 3,
+          }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Breadcrumbs separator="›" aria-label="breadcrumbs">
+            <Typography>Cadastro</Typography>
+            <Typography>Dados Pagamento</Typography>
+          </Breadcrumbs>
+
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel id="despesa-label">Despesa</InputLabel>
+                  <Select
+                    labelId="despesa-label"
+                    id="despesa"
+                    name="despesa"
+                    value={formData.despesa?.id}
+                    onChange={handleSelectChange}
+                    label="Despesa"
+                  >
+                    {despesasLista.map((tipo, index) => (
+                      <MenuItem key={index} value={tipo.id}>
+                        {tipo.descricao}| Parcela - {tipo.parcela}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="Descriçao"
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleTextFieldChange}
+                  fullWidth
+                  required
+                  variant="outlined"
+                />
+              </Grid>
+
+              <Grid item xs={12} md={5}>
+                <TextField
+                  label="Dados Pagamento"
+                  name="dadosPagamento"
+                  value={formData.dadosPagamento}
+                  onChange={handleTextFieldChange}
+                  fullWidth
+                  required
+                  variant="outlined"
+                />
+              </Grid>
+            </Grid>
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={cancelarDadosPagamento}
+                sx={{ mr: 2, ml: 1 }}
+              >
+                Deletar
+              </Button>
+              <Button variant="outlined" onClick={handleOpenModal}>
+                Buscar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleReset}
+                variant="outlined"
+                color="secondary"
+                sx={{ mr: 2, ml: 1 }}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" variant="contained" color="primary">
+                Salvar
+              </Button>
+            </Box>
+          </form>
+        </Card>
+        <Divider />
+        <Dialog
+          open={openModal}
+          onClose={handleCloseModal}
+          maxWidth="lg"
+          fullWidth
+          PaperProps={{
+            sx: { width: "80%", height: "40%" },
+          }}
+        >
+          <DialogTitle>Selecionar Dados Pagamento</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth>
+              <Autocomplete
+                options={dadosPagamentoLista}
+                getOptionLabel={(option) =>
+                  `${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`
+                }
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    {`${option.despesa.descricao} - Parcela: ${option.despesa.parcela}`}
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filtre"
+                    fullWidth
+                    margin="dense"
+                  />
+                )}
+                onChange={handleSelect}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+              />
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseModal} variant="contained">
+              Aplicar
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* Snackbar para Feedback */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
   );
 };
 

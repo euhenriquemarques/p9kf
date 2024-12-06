@@ -40,7 +40,7 @@ const LandingPage: React.FC = () => {
             color: "#ffffff",
           }}
         >
-          NestEgg
+          Hostmoney
         </Typography>
         <Typography variant="h6" color="#ffffff">
           Seu Caderno Financeiro

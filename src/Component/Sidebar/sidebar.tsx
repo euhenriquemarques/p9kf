@@ -94,7 +94,7 @@ export default function DashboardLayoutBasic(props: DemoProps) {
   return (
     
     <AppProvider  navigation={NAVIGATION} router={router} theme={demoTheme}  branding={{
-      title: "NestEgg",
+      title: "Hostmoney",
       logo: <span style={{ display: 'none' }} />,}}>
         <div ref={sidebarRef}>
         <DashboardLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>

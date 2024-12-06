@@ -137,7 +137,7 @@ const Navbar: React.FC = () => {
               alignItems: "center",
             }}
           >
-            NestEgg
+            Hostmoney
           </Typography>
 
           <Menu
