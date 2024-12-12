@@ -71,15 +71,15 @@ const Cartao: React.FC = () => {
       });
     }
   };
-
+  const token = localStorage.getItem("token"); 
   const buscarCartao = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/cartao/todos",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       setListaCartao(response.data);
@@ -124,6 +124,7 @@ const Cartao: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -136,13 +137,13 @@ const Cartao: React.FC = () => {
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }

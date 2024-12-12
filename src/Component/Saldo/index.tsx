@@ -40,6 +40,7 @@ const Saldo: React.FC = () => {
     conta: {
       id: 0,
       numero: "",
+      descricao: "",
       agencia: "",
       banco: {
         id: 0,
@@ -131,6 +132,7 @@ const Saldo: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -142,13 +144,13 @@ const Saldo: React.FC = () => {
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -172,6 +174,7 @@ const Saldo: React.FC = () => {
         id: 0,
         numero: "",
         agencia: "",
+        descricao: "",
         banco: {
           id: 0,
           codigo: "",
@@ -188,13 +191,13 @@ const Saldo: React.FC = () => {
       saldo: 0,
     });
   };
-
+  const token = localStorage.getItem("token"); 
   async function buscarContas() {
     try {
       const response = await axios.get("http://localhost:8080/conta", {
-        params: {
-          idUsuario: 1,
-        },
+        headers: {
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+      }
       });
       if (response.status === 200) {
         const data = await response.data;
@@ -300,7 +303,7 @@ const Saldo: React.FC = () => {
                 >
                   {contaLista.map((tipo, index) => (
                     <MenuItem key={index} value={tipo.id}>
-                      {tipo.banco.descricao} | {tipo.agencia} - {tipo.numero}
+                      {tipo.banco.descricao} | {tipo.agencia} - {tipo.numero} - {tipo.descricao} 
                     </MenuItem>
                   ))}
                 </Select>

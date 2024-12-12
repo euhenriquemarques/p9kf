@@ -55,7 +55,7 @@ const Banco: React.FC = () => {
     }
   };
 
-
+  const token = localStorage.getItem("token"); 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -63,6 +63,7 @@ const Banco: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
         },
         body: JSON.stringify(formData),
       });
@@ -81,13 +82,13 @@ const Banco: React.FC = () => {
       } else {
         // Erro
         const errorText = await response.text();
-        setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     } catch (error) {
       console.error("Erro:", error);
-      setSnackbarMessage("Erro ao realizar o cadastro.");
+      setSnackbarMessage("Validar todos os campos !");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
@@ -113,11 +114,16 @@ const Banco: React.FC = () => {
 
   const buscarBancos = async () => {
     try {
-      const response = await fetch("http://localhost:8080/banco");
+      const response = await fetch("http://localhost:8080/banco", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }});
       const data = await response.json();
       setListaBanco(data);
     } catch (error) {
-      console.error("Erro ao buscar bancos:", error);
+      console.error("Erro ao buscar Despesas:", error);
     }
   };
 

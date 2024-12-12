@@ -40,7 +40,7 @@ const LandingPage: React.FC = () => {
             color: "#ffffff",
           }}
         >
-          Hostmoney
+          HostMoney
         </Typography>
         <Typography variant="h6" color="#ffffff">
           Seu Caderno Financeiro

@@ -66,15 +66,15 @@ const Categoria: React.FC = () => {
       });
     }
   };
-
+  const token = localStorage.getItem("token"); 
   const buscarCategoria = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/categoria/todos",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       setListaCategoria(response.data);
@@ -129,6 +129,7 @@ const Categoria: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -141,13 +142,13 @@ const Categoria: React.FC = () => {
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -184,6 +185,7 @@ const Categoria: React.FC = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
         }
       );

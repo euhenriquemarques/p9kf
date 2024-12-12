@@ -137,7 +137,7 @@ const Navbar: React.FC = () => {
               alignItems: "center",
             }}
           >
-            Hostmoney
+            HostMoney
           </Typography>
 
           <Menu

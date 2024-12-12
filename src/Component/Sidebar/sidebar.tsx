@@ -1,22 +1,31 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { createTheme } from '@mui/material/styles';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useLocation, useNavigate } from 'react-router-dom';
-import type { Navigation, Session } from '@toolpad/core';
-import { dataSideBar } from './data';
+import * as React from "react";
+import { createTheme } from "@mui/material/styles";
+import { AppProvider } from "@toolpad/core/AppProvider";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { Navigation, Session } from "@toolpad/core";
+import { dataSideBar } from "./data";
 import "./style.css";
-import { log } from 'console';
+
 
 const NAVIGATION: Navigation = dataSideBar;
 
-
 const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
   typography: {
     h6: {
-      fontFamily: "Anton !important",
+      fontFamily: "Poppins !important",
       fontSize: "2rem",
       color: "#ffffff !important",
     },
@@ -32,10 +41,9 @@ const demoTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          '& .MuiToolbar-root': {
-            backgroundColor: '#0e0f15',
-            color: '#ffffff',
-            
+          "& .MuiToolbar-root": {
+            backgroundColor: "#0e0f15",
+            color: "#ffffff",
           },
         },
       },
@@ -50,61 +58,71 @@ interface DemoProps {
 
 export default function DashboardLayoutBasic(props: DemoProps) {
   const { children } = props;
+  const username = localStorage.getItem('username');
+
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
-
-  // 2. Fechar a sidebar ao clicar fora dela
-  const sidebarRef = React.useRef<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
-        setSidebarOpen(false);
-      }
-    }
-
-    // Adiciona o event listener
-    window.addEventListener('mousedown', handleClickOutside);
-
-    // Remove o listener ao desmontar o componente
-    return () => {
-      window.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-  
 
   const router = React.useMemo(() => {
     return {
       pathname: location.pathname,
       searchParams: new URLSearchParams(location.search),
       navigate: (path: string | URL) => {
-        if (typeof path === 'string') {
-          navigate(path);  // Apenas navegue para o caminho diretamente
+        if (typeof path === "string") {
+          navigate(path);
         } else {
           navigate(path.toString());
         }
       },
     };
   }, [location, navigate]);
-
   
+  
+  const [session, setSession] = React.useState<Session | null>({
+    user: {
+      name: username,
+      email: '',
+      image: '',
+    },
+  });
+
+const authentication = React.useMemo(() => {
+  return {
+    signIn: () => {
+      setSession({
+        user: {
+          name: username,
+          email: '',
+          image: '',
+        },
+      });
+    },
+    signOut: () => {
+      setSession(null);
+      localStorage.removeItem("token");
+      navigate('/login');
+    },
+  };
+}, []);
 
   return (
-    
-    <AppProvider  navigation={NAVIGATION} router={router} theme={demoTheme}  branding={{
-      title: "Hostmoney",
-      logo: <span style={{ display: 'none' }} />,}}>
-        <div ref={sidebarRef}>
-        <DashboardLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
-       
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      session={session}
+      theme={demoTheme}
+      authentication={authentication}
+      branding={{
+        title: "HostMoney",
+        logo: (
+          <img src="/skull.png" alt="Logo" style={{ marginRight: "8px" }} />
+        ),
+      }}
+    >
+      <DashboardLayout disableCollapsibleSidebar={false}>
         {children}
-        </DashboardLayout>
-        </div>
+      </DashboardLayout>
     </AppProvider>
   );
 }
-
-
-

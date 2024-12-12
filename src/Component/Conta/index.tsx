@@ -35,6 +35,7 @@ import axios from "axios";
 const Conta: React.FC = () => {
   const [formData, setFormData] = useState<iConta>({
     id: 0,
+    descricao: "",
     numero: "",
     agencia: "",
     banco: {
@@ -68,6 +69,7 @@ const Conta: React.FC = () => {
         id: value.id,
         numero: value.numero,
         agencia: value.agencia,
+        descricao: value.descricao,
         banco: value.banco,
         compartilhado: value.compartilhado,
         status: value.status,
@@ -76,15 +78,15 @@ const Conta: React.FC = () => {
       })
     }
   };
-
+  const token = localStorage.getItem("token"); 
   const buscarConta = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/conta",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       setListaConta(response.data);
@@ -148,6 +150,7 @@ const Conta: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -160,13 +163,13 @@ const Conta: React.FC = () => {
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -187,6 +190,7 @@ const Conta: React.FC = () => {
     setFormData({
       id: 0,
       numero: "",
+      descricao: "",
       agencia: "",
       banco: {
         id: 0,
@@ -209,7 +213,9 @@ const Conta: React.FC = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
         },
+        
       });
       if (response.ok) {
         const data = await response.json();
@@ -268,7 +274,7 @@ const Conta: React.FC = () => {
                 variant="outlined"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <TextField
                 label="Numero Conta"
                 name="numero"
@@ -280,7 +286,7 @@ const Conta: React.FC = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={3}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel id="banco-label">Banco</InputLabel>
                 <Select
@@ -299,6 +305,18 @@ const Conta: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
+            <Grid item xs={12} md={4}>
+                <TextField
+                  label="Descriçao"
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleTextFieldChange}
+                  fullWidth
+                  required
+                  variant="outlined"
+                  disabled={formData.id !== 0}
+                />
+              </Grid>
 
             <Grid item xs={12} md={2}>
               <FormControl fullWidth variant="outlined">
@@ -406,15 +424,15 @@ const Conta: React.FC = () => {
         <DialogTitle>Selecionar Conta</DialogTitle>
         <DialogContent>
         <FormControl fullWidth>
-      <Autocomplete
-        options={listaConta}
-        getOptionLabel={(option) =>
-          `${option.banco.descricao} - Agência: ${option.agencia} - Número: ${option.numero}`
-        }
-        renderOption={(props, option) => (
-          <li {...props} key={option.id}>
-            {`${option.banco.descricao} - Agência: ${option.agencia} - Número: ${option.numero}`}
-          </li>
+        <Autocomplete
+                options={listaConta}
+                getOptionLabel={(option) =>
+                  `${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero}: ${option.descricao}`
+                }
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    {`${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero} : ${option.descricao}`}
+                  </li>
         )}
         renderInput={(params) => (
           <TextField

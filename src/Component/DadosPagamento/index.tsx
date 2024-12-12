@@ -106,15 +106,15 @@ const DadosPagamento: React.FC = () => {
       });
     }
   };
-
+  const token = localStorage.getItem("token"); 
   const buscarDadosPagamento = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8080/dadosPagamento/vigente",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       setDadosPagamentoListas(response.data);
@@ -171,6 +171,7 @@ const DadosPagamento: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -183,13 +184,13 @@ const DadosPagamento: React.FC = () => {
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -245,9 +246,9 @@ const DadosPagamento: React.FC = () => {
       const response = await axios.get(
         "http://localhost:8080/despesa/geralVigentes",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       if (response.status === 200) {
@@ -256,7 +257,7 @@ const DadosPagamento: React.FC = () => {
       } else {
         // Erro
         const errorText = await response.status;
-        setSnackbarMessage("Erro ao buscar Bancos ");
+        setSnackbarMessage("Erro ao buscar Despesas ");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }

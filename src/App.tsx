@@ -19,6 +19,10 @@ import Cartao from "./Component/Cartao";
 import DespesaCartao from "./Component/DespesaCartao";
 import ExtratoDespesaCartao from "./Component/ExtratoDespesaCartao";
 import Receita from "./Component/Receita";
+import ExtratoReceita from "./Component/ExtratoReceita";
+import ProtectedRoute from "./Utils/ProtectedRoute";
+import Login from "./Component/Login";
+import NotAuthorized from "./Pages/403/NotAuthorized";
 
 const App: React.FC = () => {
   return (
@@ -31,20 +35,35 @@ const App: React.FC = () => {
           <Routes>
             {/* Rotas públicas */}
             <Route path="/price" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
 
             {/* Rotas que utilizam o layout de dashboard */}
             <Route
               path="/"
               element={
-                <Principal>
-                  <DashboardLayoutBasic />
-                </Principal>
+                <ProtectedRoute>
+                  <Principal>
+                    <DashboardLayoutBasic />
+                  </Principal>
+                </ProtectedRoute>
               }
             >
               <Route path="/" element={<HomePage />} />
               {/* Sub-rotas dentro de Dashboard */}
-              <Route path="/cadastro/adm" element={ <> <Banco />  <Usuario /> </>} />
-              <Route path="/cadastro/categoria" element={<Categoria />} />
+              <Route
+                path="/cadastro/adm"
+                element={
+                  <ProtectedRoute requiredRole="ROLE_ADM">
+                    <>
+                      <Banco />
+                      <Usuario />
+                    </>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/cadastro/categoria" element={<ProtectedRoute requiredRole="ROLE_ADM">
+                <><Categoria />  </>
+                </ProtectedRoute>} />
               <Route path="/cadastro/cartao" element={<Cartao />} />
               <Route path="/cadastro/conta" element={<Conta />} />
               <Route path="/cadastro/dadosPagamento" element={<DadosPagamento />} />
@@ -53,10 +72,13 @@ const App: React.FC = () => {
               <Route path="/cadastro/despesaCartao" element={<DespesaCartao />} />
               <Route path="/cadastro/despesa/extrato" element={<ExtratoDespesa />} />
               <Route path="/cadastro/despesa/extratoCartao" element={<ExtratoDespesaCartao />} />
+              <Route path="/cadastro/receita/extratoReceita" element={<ExtratoReceita />} />
               <Route path="/saldo" element={<Saldo />} />
             </Route>
                   {/* Rota 404 */}
             <Route path="*" element={<NotFound />} />
+            <Route path="/not-authorized" element={<NotAuthorized />} />
+
           </Routes>
         </Box>
       </div>

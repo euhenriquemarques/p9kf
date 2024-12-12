@@ -5,6 +5,11 @@ import axios from "axios";
 import dayjs from "dayjs";
 
 const HomePage: React.FC = () => {
+  
+  
+  const token = localStorage.getItem("token"); 
+       
+
   const [formData, setFormData] = useState<iHomeDto>({
     valortotalParcelado: 0,
     valortotalRecorrente: 0,
@@ -43,6 +48,7 @@ const HomePage: React.FC = () => {
       {
         saldo: 0,
         banco: "",
+        descricao: "",
         numero: "",
       },
     ],
@@ -51,9 +57,9 @@ const HomePage: React.FC = () => {
   async function buscarHome() {
     try {
       const response = await axios.get("http://localhost:8080/homepage", {
-        params: {
-          idUsuario: 1,
-        },
+        headers: {
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+      }
       });
       if (response.status === 200) {
         const data = await response.data;
@@ -167,7 +173,7 @@ const HomePage: React.FC = () => {
                           color: "#FFA500",
                         }}
                       >
-                        {item.banco}
+                        {item.descricao}- {item.banco}
                       </Typography>
                       <Typography
                         variant="body1"
@@ -576,7 +582,7 @@ const HomePage: React.FC = () => {
 
               {/* Cabeçalho com os meses */}
               <Box
-              className="scrollable-content"
+                className="scrollable-content"
                 sx={{
                   display: "flex",
                   borderBottom: "1px solid #555",
@@ -836,8 +842,6 @@ const HomePage: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-
-
 
         {/* Lower Cards */}
       </Grid>

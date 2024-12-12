@@ -24,8 +24,8 @@ import {
 import {
   iCategoria,
   iConta,
-  iDespesas,
-  iExtratoDespesa,
+  iReceitas,
+  iExtratoReceita,
 } from "../../Interface/interface";
 import axios from "axios";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -36,8 +36,8 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/pt-br";
 
-const ExtratoDespesa: React.FC = () => {
-  const [formData, setFormData] = useState<iExtratoDespesa>({
+const ExtratoReceita: React.FC = () => {
+  const [formData, setFormData] = useState<iExtratoReceita>({
     id: 0,
     valor: 0,
     valorJuros: 0,
@@ -49,7 +49,7 @@ const ExtratoDespesa: React.FC = () => {
       descricao: "",
     },
     dataProcessamento: "",
-    despesa: {
+    receita: {
       id: 0,
       categoria: {
         id: 0,
@@ -69,7 +69,6 @@ const ExtratoDespesa: React.FC = () => {
       parcela: 1,
       parcelaTotais: 1,
       dataVencimentoParcela: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-      juros: false,
       ativo: true,
       valorParcela: 0,
       valorTotal: 0,
@@ -77,7 +76,7 @@ const ExtratoDespesa: React.FC = () => {
     },
   });
 
-  const [despesasLista, setDespesaLista] = useState<iDespesas[]>([]);
+  const [receitasLista, setReceitaLista] = useState<iReceitas[]>([]);
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -88,7 +87,7 @@ const ExtratoDespesa: React.FC = () => {
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
     const { name, value } = e.target;
 
-    const selecionado = despesasLista.find((item) => item.id === Number(value));
+    const selecionado = receitasLista.find((item) => item.id === Number(value));
     setFormData((prevState) => ({
       ...prevState,
       [name]: selecionado,
@@ -145,7 +144,7 @@ const ExtratoDespesa: React.FC = () => {
 
     if (isValid) {
       try {
-        const response = await fetch("http://localhost:8080/extratoDespesa", {
+        const response = await fetch("http://localhost:8080/extratoReceita", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -157,10 +156,10 @@ const ExtratoDespesa: React.FC = () => {
           setSnackbarMessage("Cadastro realizado com sucesso!");
           setSnackbarSeverity("success");
           setOpenSnackbar(true);
-          setDespesaLista([]);
+          setReceitaLista([]);
           handleReset();
-          buscarDespesasVigentes();
           setSelectedConta(null); // Reseta o valor do Autocomplete
+          buscarReceitasVigentes();
         } else {
           // Erro
           const errorText = await response.text();
@@ -200,7 +199,7 @@ const ExtratoDespesa: React.FC = () => {
         descricao: "",
       },
       dataProcessamento: "",
-      despesa: {
+      receita: {
         id: 0,
         categoria: {
           id: 0,
@@ -220,7 +219,6 @@ const ExtratoDespesa: React.FC = () => {
         parcela: 1,
         parcelaTotais: 1,
         dataVencimentoParcela: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
-        juros: false,
         ativo: true,
         valorParcela: 0,
         valorTotal: 0,
@@ -229,10 +227,10 @@ const ExtratoDespesa: React.FC = () => {
     });
   };
 
-  async function buscarDespesasVigentes() {
+  async function buscarReceitasVigentes() {
     try {
       const response = await axios.get(
-        "http://localhost:8080/despesa/vigente",
+        "http://localhost:8080/receita/vigente",
         {
           headers: {
             Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
@@ -241,16 +239,13 @@ const ExtratoDespesa: React.FC = () => {
       );
       if (response.status === 200) {
         const data = await response.data;
-        setDespesaLista(data);
-     
- 
+        setReceitaLista(data);
       } else {
         // Erro
         const errorText = await response.status;
         setSnackbarMessage("Lista Vazia ou Nao Encontrada");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
-        
       }
     } catch (error) {
       console.error("Erro:", error);
@@ -260,12 +255,11 @@ const ExtratoDespesa: React.FC = () => {
   }
 
   useEffect(() => {
-    buscarDespesasVigentes();
+    buscarReceitasVigentes();
     buscarConta();
   }, []);
 
   const handleSelect = (event: React.SyntheticEvent, value: iConta | null) => {
-
     if (value) {
       setFormData((prevState) => ({
         ...prevState,
@@ -309,23 +303,23 @@ const ExtratoDespesa: React.FC = () => {
       >
         <Breadcrumbs separator="›" aria-label="breadcrumbs">
           <Typography>Cadastro</Typography>
-          <Typography>Extrato Despesa</Typography>
+          <Typography>Extrato Receita</Typography>
         </Breadcrumbs>
 
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2} sx={{ mt: 1, mb: 3 }}>
             <Grid item xs={12} md={8}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel id="despesa-label">Despesa</InputLabel>
+                <InputLabel id="receita-label">Receita</InputLabel>
                 <Select
-                  labelId="despesa-label"
-                  id="despesa"
-                  name="despesa"
-                  value={formData.despesa.id}
+                  labelId="receita-label"
+                  id="receita"
+                  name="receita"
+                  value={formData.receita.id}
                   onChange={handleSelectChange}
-                  label="Despesa"
+                  label="Receita"
                 >
-                  {despesasLista.map((tipo, index) => (
+                  {receitasLista.map((tipo, index) => (
                     <MenuItem key={index} value={tipo.id}>
                       <span style={{ minWidth: "250px" }}>
                         {" "}
@@ -408,31 +402,30 @@ const ExtratoDespesa: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-            <Autocomplete
-  options={listaConta}
-  value={selectedConta}
-  getOptionLabel={(option) =>
-    `${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero}: ${option.descricao}`
-  }
-  renderOption={(props, option) => (
-    <li {...props} key={option.id}>
-      {`${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero} : ${option.descricao}`}
-    </li>
-  )}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Buscar por Banco, Agência ou Número"
-      fullWidth
-    />
-  )}
-  onChange={(event, value) => {
-    setSelectedConta(value);
-    handleSelect(event, value);
-  }}
-  isOptionEqualToValue={(option, value) => option.id === value.id}
-/>
-
+              <Autocomplete
+                options={listaConta}
+                value={selectedConta}
+                getOptionLabel={(option) =>
+                  `${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero}: ${option.descricao}`
+                }
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    {`${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero} : ${option.descricao}`}
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Buscar por Banco, Agência ou Número"
+                    fullWidth
+                  />
+                )}
+                onChange={(event, value) => {
+                  setSelectedConta(value);
+                  handleSelect(event, value);
+                }}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+              />
             </Grid>
           </Grid>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -471,4 +464,4 @@ const ExtratoDespesa: React.FC = () => {
   );
 };
 
-export default ExtratoDespesa;
+export default ExtratoReceita;

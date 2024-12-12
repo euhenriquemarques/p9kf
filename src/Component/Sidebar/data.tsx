@@ -22,30 +22,24 @@ export const dataSideBar: Navigation = [
   {
     segment: 'cadastro/cartao',
     title: 'Cartao',
+    icon: <img src="/card.png" alt="Ícone Cartão" style={{ width: '24px', height: '24px' }} />,
+
   },     
   {
     segment: 'cadastro/conta',
     title: 'Conta',
+    
+    icon: <img src="/personal-data.png" style={{ width: '24px', height: '24px' }} />,
   },
   {
     segment: 'cadastro/categoria',
     title: 'Categoria',
+    icon: <img src="/categorization.png" style={{ width: '24px', height: '24px' }} />,
   },
   {
     segment: 'cadastro/dadosPagamento',
     title: 'Dados Pagamento',
-  },
-  {
-    segment: 'cadastro/despesa',
-    title: 'Despesa',
-  },  
-  {
-    segment: 'cadastro/receita',
-    title: 'Receita',
-  },
-  {
-    segment: 'cadastro/despesaCartao',
-    title: 'Despesa Cartao',
+    icon: <img src="/pagar conta.png" style={{ width: '24px', height: '24px' }} />,
   },
   {
     kind: 'divider',
@@ -56,17 +50,37 @@ export const dataSideBar: Navigation = [
   },
   {
     segment: 'saldo',
-    title: 'Saldo',
-    icon: <MonetizationOnOutlined />,
+    title: 'Atualizar Saldo',
+    icon: <img src="/saldo.png" style={{ width: '24px', height: '24px' }} />,
+  },
+  {
+    segment: 'cadastro/despesa',
+    title: 'Lançar Despesa',
+    icon: <img src="/despesas.png" style={{ width: '24px', height: '24px' }} />,
+  },  
+  {
+    segment: 'cadastro/receita',
+    title: 'Lançar Receita',
+    icon: <img src="/receita.png" style={{ width: '24px', height: '24px' }} />,
+  },
+  {
+    segment: 'cadastro/despesaCartao',
+    title: 'Lançar Despesa Cartao',
+    icon: <img src="/payment.png" style={{ width: '24px', height: '24px' }} />,
   },
   {
     segment: 'cadastro/despesa/extrato',
     title: 'Pagar Despesa',
-    icon: <PointOfSaleOutlined  />,
+    icon: <img src="/pagar conta.png" style={{ width: '24px', height: '24px' }} />,
   },
   {
     segment: 'cadastro/despesa/extratoCartao',
     title: 'Pagar Cartao',
-    icon: <PointOfSaleOutlined  />,
+    icon: <img src="/pagar cartao.png" style={{ width: '24px', height: '24px' }} />,
+  },  
+  {
+    segment: 'cadastro/receita/extratoReceita',
+    title: 'Receber Receita',
+    icon: <img src="/revenue.png" style={{ width: '24px', height: '24px' }} />,
   },
 ];

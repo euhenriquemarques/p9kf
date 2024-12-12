@@ -19,10 +19,12 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  Autocomplete,
 } from "@mui/material";
 import {
   iCartao,
   iCategoria,
+  iConta,
   iDespesas,
   iExtratoDespesaCartao,
 } from "../../Interface/interface";
@@ -42,6 +44,7 @@ const ExtratoDespesaCartao: React.FC = () => {
     valorJuros: 0,
     dataPagamento: dayjs(),
     valorDesconto: 0,
+    idConta: 0,
     usuario: {
       id: 1,
       descricao: "",
@@ -127,6 +130,7 @@ const ExtratoDespesaCartao: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
           },
           body: JSON.stringify(formData),
         });
@@ -137,16 +141,18 @@ const ExtratoDespesaCartao: React.FC = () => {
           setCartaoLista([]);
           handleReset();
           buscarCartoes();
+          setSelectedConta(null); // Reseta o valor do Autocomplete
+ 
         } else {
           // Erro
           const errorText = await response.text();
-          setSnackbarMessage("Erro ao realizar o cadastro: " + errorText);
+          setSnackbarMessage("Validar todos os campos !");
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
         console.error("Erro:", error);
-        setSnackbarMessage("Erro ao realizar o cadastro.");
+        setSnackbarMessage("Validar todos os campos !");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -170,6 +176,7 @@ const ExtratoDespesaCartao: React.FC = () => {
       valorJuros: 0,
       dataPagamento: dayjs(),
       valorDesconto: 0,
+      idConta: 0,
       usuario: {
         id: 1,
         descricao: "",
@@ -187,15 +194,15 @@ const ExtratoDespesaCartao: React.FC = () => {
       },
     });
   };
-
+  const token = localStorage.getItem("token"); 
   async function buscarCartoes() {
     try {
       const response = await axios.get(
         "http://localhost:8080/cartao/todos",
         {
-          params: {
-            idUsuario: 1,
-          },
+          headers: {
+            Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+        }
         }
       );
       if (response.status === 200) {
@@ -217,7 +224,34 @@ const ExtratoDespesaCartao: React.FC = () => {
 
   useEffect(() => {
     buscarCartoes();
+    buscarConta();
   }, []);
+
+  const [listaConta, setListaConta] = useState<iConta[]>([]);
+  
+  const [selectedConta, setSelectedConta] = useState<iConta | null>(null);
+
+  const buscarConta = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/conta", {
+        headers: {
+          Authorization: `Bearer ${token}` // Adicionar o token no cabeçalho
+      }
+      });
+      setListaConta(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar Contas:", error);
+    }
+  };
+  const handleSelect = (event: React.SyntheticEvent, value: iConta | null) => {
+
+    if (value) {
+      setFormData((prevState) => ({
+        ...prevState,
+        ["idConta"]: value.id,
+      }));
+    }
+  };
 
   return (
     <Box
@@ -317,6 +351,33 @@ const ExtratoDespesaCartao: React.FC = () => {
                 variant="outlined"
                 inputProps={{ min: 0 }}
               />
+            </Grid>
+            <Grid item xs={12} md={4}>
+            <Autocomplete
+  options={listaConta}
+  value={selectedConta}
+  getOptionLabel={(option) =>
+    `${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero}: ${option.descricao}`
+  }
+  renderOption={(props, option) => (
+    <li {...props} key={option.id}>
+      {`${option.banco.descricao} - Ag: ${option.agencia} : ${option.numero} : ${option.descricao}`}
+    </li>
+  )}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Buscar por Banco, Agência ou Número"
+      fullWidth
+    />
+  )}
+  onChange={(event, value) => {
+    setSelectedConta(value);
+    handleSelect(event, value);
+  }}
+  isOptionEqualToValue={(option, value) => option.id === value.id}
+/>
+
             </Grid>
           </Grid>
 

@@ -46,6 +46,7 @@ export  interface iBanco {
   export interface iConta {
     id: number;
     numero: string;
+    descricao: string;
     agencia: string;
     banco: iBanco;
     compartilhado: boolean;
@@ -110,11 +111,24 @@ export  interface iBanco {
   
 
   
+  export interface iExtratoReceita {
+    id: number;
+    valor:number,
+    valorJuros:number,
+    valorDesconto:number,
+    idConta:number,
+    receita:iReceitas,
+    usuario: iUsuario;
+    dataProcessamento: string;
+    dataPagamento: Dayjs | string;
+  }
+  
   export interface iExtratoDespesa {
     id: number;
     valor:number,
     valorJuros:number,
     valorDesconto:number,
+    idConta:number,
     despesa:iDespesas,
     usuario: iUsuario;
     dataProcessamento: string;
@@ -126,6 +140,7 @@ export  interface iBanco {
     valor:number,
     valorJuros:number,
     valorDesconto:number,
+    idConta:number,
     cartao :iCartao,
     usuario: iUsuario;
     dataProcessamento: string;
@@ -153,6 +168,7 @@ export  interface iBanco {
   export interface iSaldoDto {
     saldo:number,
     banco:string,
+    descricao:string,
     numero:string,
   
   }
